@@ -9,7 +9,8 @@ use App\Models\{
     User,
     Company,
     Item,
-    Variation
+    Variation,
+    SubCompany
 };
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -283,9 +284,10 @@ class CompanyAuthController extends Controller
     {
         $categoryCount = Variation::where('status','active')->count();
         $itemCount = Item::where('status','active')->count();
+        $subcompanyCount = SubCompany::where('status','active')->count();
         $vendorCount = User::where('status','active')->where('role','vendor')->count();
         $customerCount = User::where('status','active')->where('role','customer')->count();
-        return view("company.dashboard.index",compact('categoryCount','itemCount','vendorCount','customerCount'));
+        return view("company.dashboard.index",compact('categoryCount','itemCount','vendorCount','customerCount','subcompanyCount'));
     }
 
 
