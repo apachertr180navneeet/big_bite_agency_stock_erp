@@ -24,7 +24,7 @@
 			<div class="nav-item d-flex align-items-center text-primary">
 				<i class="bx bx-calendar fs-4 lh-0"></i>&nbsp;
 				<span class="">{{ date('D') }} {{ date('d M Y') }}</span>&nbsp;&nbsp;
-				<span class="ml-2">Company State :- {{ $company->state }}</span>
+				{{--  <span class="ml-2">Company State :- {{ $company->state }}</span>  --}}
 			</div>
 		</div>
 		<!-- /Search -->

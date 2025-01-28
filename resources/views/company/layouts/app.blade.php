@@ -37,8 +37,8 @@
                     @include('company.layouts.elements.header')
                     <div class="content-wrapper">
                         @yield('content')
-                        @include('company.layouts.elements.footer')
                         <div class="content-backdrop fade"></div>
+                        @include('company.layouts.elements.footer')
                     </div>
                     @include('company.layouts.elements.right_sidebar')
                 </div>

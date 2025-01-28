@@ -7,12 +7,12 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Variation</span>
+                <span class="text-primary fw-light">Category</span>
             </h5>
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                Add Variation
+                Add Category
             </button>
         </div>
     </div>
@@ -24,7 +24,7 @@
                         <table class="table table-bordered" id="variationTable">
                             <thead>
                                 <tr>
-                                    <th>Variation code</th>
+                                    {{--  <th>Variation code</th>  --}}
                                     <th>Unit Name</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -55,7 +55,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="code" class="form-label">Code</label>
-                        <input type="text" id="code" class="form-control" placeholder="Enter Code" />
+                        <input type="text" id="code" value="cat" class="form-control" placeholder="Enter Code" />
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -108,7 +108,6 @@
                 type: 'GET',
             },
             columns: [
-                { data: "code" },
                 { data: "name" },
                 {
                     data: "status",

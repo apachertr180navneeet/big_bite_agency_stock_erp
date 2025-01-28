@@ -87,7 +87,7 @@ class VariationController extends Controller
         // Validation rules
         $rules = [
             'name' => 'required|string|max:255',
-            'code' => 'required|max:255|unique:variations',
+            // 'code' => 'required|max:255|unique:variations',
         ];
 
         // Validate the request data
@@ -130,7 +130,7 @@ class VariationController extends Controller
         // Validation rules
         $rules = [
             'name' => 'required|string|max:255',
-            'code' => 'required|max:255',
+            // 'code' => 'required|max:255',
         ];
 
         // Validate the request data
