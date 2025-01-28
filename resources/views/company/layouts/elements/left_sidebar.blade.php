@@ -26,8 +26,7 @@
             </a>
             <ul class="menu-sub">
                 @foreach([
-                    ['route' => 'company.variation.index', 'text' => 'Variation'],
-                    ['route' => 'company.bank.index', 'text' => 'Bank'],
+                    ['route' => 'company.variation.index', 'text' => 'Category'],
                     ['route' => 'company.item.index', 'text' => 'Item'],
                     ['route' => 'company.vendor.index', 'text' => 'Vendor'],
                     ['route' => 'company.customer.index', 'text' => 'Customer'],
@@ -42,15 +41,15 @@
             </ul>
         </li>
 
-        <li class="menu-item {{ request()->routeIs('company.bank.and.cash.') ? 'active' : '' }}">
+        {{--  <li class="menu-item {{ request()->routeIs('company.bank.and.cash.') ? 'active' : '' }}">
             <a href="{{ route('company.bank.and.cash.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Bank And Cash</div>
             </a>
-        </li>
+        </li>  --}}
 
         {{--  Process menu  --}}
-        <li class="menu-item {{ request()->routeIs(['company.purches.book.*', 'company.sales.book.*', 'company.receipt.book.voucher.*', 'company.payment.book.*']) ? 'active open' : '' }}">
+        {{--  <li class="menu-item {{ request()->routeIs(['company.purches.book.*', 'company.sales.book.*', 'company.receipt.book.voucher.*', 'company.payment.book.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div class="text-truncate" data-i18n="Master">Process</div>
@@ -70,10 +69,10 @@
                     </li>
                 @endforeach
             </ul>
-        </li>
+        </li>  --}}
 
          {{--  Report menu  --}}
-         <li class="menu-item {{ request()->routeIs(['company.purches.report.*', 'company.sales.report.*', 'company.receipt.report.*', 'company.payment.report.*', 'company.payment.report.*', 'company.stock.report.*', 'company.gst.report.*']) ? 'active open' : '' }}">
+         {{--  <li class="menu-item {{ request()->routeIs(['company.purches.report.*', 'company.sales.report.*', 'company.receipt.report.*', 'company.payment.report.*', 'company.payment.report.*', 'company.stock.report.*', 'company.gst.report.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div class="text-truncate" data-i18n="Master">Report</div>
@@ -97,7 +96,7 @@
                     </li>
                 @endforeach
             </ul>
-        </li>
+        </li>  --}}
 
 
 

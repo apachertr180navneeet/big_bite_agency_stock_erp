@@ -159,15 +159,12 @@ Route::prefix('company')->name('company.')->group(function () {
         });
 
         // Resource Management Routes (Variation, Tax, Item, Vendor, Customer)
-        foreach (['variation', 'tax', 'item', 'vendor', 'customer','bank'] as $resource) {
+        foreach (['variation', 'tax', 'item', 'vendor', 'customer'] as $resource) {
             Route::prefix($resource)->name("$resource.")->group(function () use ($resource) {
                 $controller = "App\Http\Controllers\Company\\" . ucfirst($resource) . "Controller";
                 Route::get('/', [$controller, 'index'])->name('index');
                 Route::get('all', [$controller, 'getall'])->name('getall');
                 Route::post('store', [$controller, 'store'])->name('store');
-                if($resource == 'bank'){
-                    Route::post('show_invoice', [$controller, 'show_invoice'])->name('show.invoice');
-                }
                 Route::post('status', [$controller, 'status'])->name('status');
                 Route::delete('delete/{id}', [$controller, 'destroy'])->name('destroy');
                 Route::get('get/{id}', [$controller, 'get'])->name('get');
