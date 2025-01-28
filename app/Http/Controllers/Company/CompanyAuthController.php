@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\{User,Company};
+use App\Models\{
+    User,
+    Company,
+    Item,
+    Variation
+};
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Mail, DB, Hash, Validator, Session, File,Exception;
@@ -276,7 +281,11 @@ class CompanyAuthController extends Controller
 
     public function companyDashboard()
     {
-        return view("company.dashboard.index");
+        $categoryCount = Variation::where('status','active')->count();
+        $itemCount = Item::where('status','active')->count();
+        $vendorCount = User::where('status','active')->where('role','vendor')->count();
+        $customerCount = User::where('status','active')->where('role','customer')->count();
+        return view("company.dashboard.index",compact('categoryCount','itemCount','vendorCount','customerCount'));
     }
 
 

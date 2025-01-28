@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Models\{
+    User,
+};
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Mail, DB, Hash, Validator, Session, File,Exception;
