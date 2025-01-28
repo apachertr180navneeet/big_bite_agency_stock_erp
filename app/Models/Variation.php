@@ -12,7 +12,7 @@ class Variation extends Model
     use HasFactory , SoftDeletes;
 
     protected $fillable = [
-        'name', 'code', 'company_id' // Add all the attributes you want to be mass assignable
+        'name', 'code', 'company_id', 'sub_compnay_id' // Add all the attributes you want to be mass assignable
     ];
 
 

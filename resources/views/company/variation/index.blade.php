@@ -25,7 +25,8 @@
                             <thead>
                                 <tr>
                                     {{--  <th>Variation code</th>  --}}
-                                    <th>Unit Name</th>
+                                    <th>Name</th>
+                                    <th>Sub Company Name</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -43,7 +44,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Variation Add</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Category Add</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -54,8 +55,13 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="code" class="form-label">Code</label>
-                        <input type="text" id="code" value="cat" class="form-control" placeholder="Enter Code" />
+                        <label for="sub_company" class="form-label">Sub Company</label>
+                        <select id="sub_company" class="form-select form-select">
+                            <option value="">select</option>
+                            @foreach ( $subcompany as $var )
+                                <option value="{{ $var->id }}">{{ $var->name }}</option>
+                            @endforeach
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -72,7 +78,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Variation Edit</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Category Edit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -84,8 +90,13 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="code" class="form-label">Code</label>
-                        <input type="text" id="editcode" class="form-control" placeholder="" />
+                        <label for="edit_sub_company" class="form-label">Sub Company</label>
+                        <select id="edit_sub_company" class="form-select form-select">
+                            <option value="">select</option>
+                            @foreach ( $subcompany as $var )
+                                <option value="{{ $var->id }}">{{ $var->name }}</option>
+                            @endforeach
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -109,6 +120,7 @@
             },
             columns: [
                 { data: "name" },
+                { data: "sub_company_name" },
                 {
                     data: "status",
                     render: (data, type, row) => {
@@ -142,7 +154,7 @@
             // Collect form data
             let data = {
                 name: $('#name').val(),
-                code: $('#code').val(),
+                sub_company: $('#sub_company').val(),
                 _token: $('meta[name="csrf-token"]').attr('content')
             };
 
@@ -187,7 +199,7 @@
                 success: function(data) {
                     $('#compid').val(data.id);
                     $('#editname').val(data.name);
-                    $('#editcode').val(data.code);
+                    $('#edit_sub_company').val(data.sub_compnay_id);
 
                     $('#editModal').modal('show');
                     setFlash("success", 'Variation found successfully.');
@@ -207,7 +219,7 @@
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(), // Ensure consistency in field names
-                    code: $('#editcode').val(), // Ensure consistency in field names
+                    sub_compnay_id: $('#edit_sub_company').val(), // Ensure consistency in field names
                     id: userId
                 },
                 success: function(response) {
@@ -238,7 +250,7 @@
 
         // Update user status
         window.updateUserStatus = function(userId, status) {
-            const message = status === "active" ? "Variation will be able to log in after activation." : "Variation will not be able to log in after deactivation.";
+            const message = status === "active" ? "Category will be able to log in after activation." : "Category will not be able to log in after deactivation.";
 
             Swal.fire({
                 title: "Are you sure?",
@@ -256,7 +268,7 @@
                         data: { userId, status, _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function (response) {
                             if (response.success) {
-                                const successMessage = status === "active" ? "Variation activated successfully." : "Variation deactivated successfully.";
+                                const successMessage = status === "active" ? "Category activated successfully." : "Category deactivated successfully.";
                                 setFlash("success", successMessage);
                             } else {
                                 setFlash("error", "There was an issue changing the status. Please contact your system administrator.");
@@ -277,7 +289,7 @@
         window.deleteUser = function(userId) {
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to delete this Variation?",
+                text: "Do you want to delete this Category?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -294,7 +306,7 @@
                             if (response.success) {
                                 setFlash("success", "User deleted successfully.");
                             } else {
-                                setFlash("error", "There was an issue deleting the variation. Please contact your system administrator.");
+                                setFlash("error", "There was an issue deleting the Category. Please contact your system administrator.");
                             }
                             table.ajax.reload();
                         },

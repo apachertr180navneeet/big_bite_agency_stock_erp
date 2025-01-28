@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\{
         User,
         Company,
-        Variation
+        Variation,
+        SubCompany
     };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 
@@ -20,8 +21,9 @@ class VariationController extends Controller
      */
     public function index(Request $request)
     {
+        $subcompany = SubCompany::where('status','active')->get();
         // Pass the company and comId to the view
-        return view('company.variation.index');
+        return view('company.variation.index',compact('subcompany'));
     }
 
     /**
@@ -36,8 +38,12 @@ class VariationController extends Controller
 
         $compId = $user->company_id;
 
-        $variation = Variation::where('company_id',$compId)->orderBy('id', 'desc')->get();
-        return response()->json(['data' => $variation]);
+        $variations = Variation::join('sub_company', 'variations.sub_compnay_id', '=', 'sub_company.id')
+        ->where('variations.company_id', $compId)
+        ->select('variations.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
+        ->orderBy('variations.id', 'desc')
+        ->get();
+        return response()->json(['data' => $variations]);
     }
 
     /**
@@ -107,13 +113,14 @@ class VariationController extends Controller
         $dataUser = [
             'name' => $request->name,
             'code' => $request->code,
-            'company_id' => $compId
+            'company_id' => $compId,
+            'sub_compnay_id' => $request->sub_company
         ];
         Variation::create($dataUser);
 
         return response()->json([
             'success' => true,
-            'message' => 'Variation saved successfully!',
+            'message' => 'Category saved successfully!',
         ]);
     }
 
@@ -146,10 +153,10 @@ class VariationController extends Controller
         $user = Variation::find($request->id);
         if ($user) {
             $user->update($request->all());
-            return response()->json(['success' => true , 'message' => 'Variation Update Successfully']);
+            return response()->json(['success' => true , 'message' => 'Category Update Successfully']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Variation not found']);
+        return response()->json(['success' => false, 'message' => 'Category not found']);
     }
 
 }
