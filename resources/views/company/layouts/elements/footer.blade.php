@@ -7,7 +7,7 @@
             </script>
             , made with ❤️ by
             <a href="https://themeselection.com" target="_blank"
-                class="footer-link fw-medium">{{ config('app.name') }}</a>    
+                class="footer-link fw-medium">Stock ERP</a>    
         </div>
         <div class="d-none d-lg-inline-block">
             <a href="#" class="footer-link me-4"

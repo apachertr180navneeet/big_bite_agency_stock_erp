@@ -6,7 +6,7 @@
         color: #ffffff !important;
     }
     .dasbord_card{
-        background-color: #313a46;
+        background-color: #272757;
     }
     .text-muted {
         color: #fff !important;
@@ -16,7 +16,7 @@
         color: #fff;
     }
     .dashboard_text_heading{
-        color: #313a46 !important;
+        color: #272757 !important;
         font-weight: bolder !important;
     }
 </style>

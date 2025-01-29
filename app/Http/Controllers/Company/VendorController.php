@@ -11,7 +11,8 @@ use App\Models\{
     Item,
     city,
     State,
-    Pincode
+    Pincode,
+    SubCompany
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 
@@ -25,8 +26,10 @@ class VendorController extends Controller
     public function index(Request $request)
     {
         $states = State::all();
+
+        $subcompany = SubCompany::where('status','active')->get();
         // Pass the company and comId to the view
-        return view('company.vendor.index', compact('states'));
+        return view('company.vendor.index', compact('states','subcompany'));
     }
 
     /**
@@ -41,7 +44,11 @@ class VendorController extends Controller
 
         $compId = $user->company_id;
 
-        $items = User::where('role', 'vendor')->where('company_id', $compId)->get();
+        $items = User::join('sub_company', 'users.sub_compnay_id', '=', 'sub_company.id')
+        ->where('users.role', 'vendor')
+        ->where('users.company_id', $compId)->select('users.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
+        ->orderBy('users.id', 'desc')
+        ->get();;
 
         return response()->json(['data' => $items]);
     }
@@ -95,6 +102,7 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Validation rules
         $rules = [
+            'sub_compnay_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => [
                 'nullable',
@@ -112,7 +120,7 @@ class VendorController extends Controller
                 //     return $query->where('role', $request->role);
                 // }),
             ],
-            'address' => 'nullable|string',
+            'address' => 'required|string',
             'city' => 'required|string|max:100',
             'state' => 'required|string',
             'gst' => 'nullable|string',
@@ -140,6 +148,7 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Save the User data
         $dataUser = [
+            'sub_compnay_id' => $request->sub_compnay_id,
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -191,13 +200,14 @@ class VendorController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'sub_compnay_id' => 'required',
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $request->id,
+            'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
             'phone' => 'required|string|max:20',
             'address' => 'nullable|string',
             'city' => 'required|string|max:100',
             'state' => 'required|string',
-            'gst_no' => 'required|string',
+            'gst_no' => 'nullable|string',
             'id' => 'required|integer|exists:users,id', // Adjust as needed
         ]);
 

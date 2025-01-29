@@ -21,7 +21,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>GST No.</th>
+                                    <th>Sub Company</th>
                                     <th>Address</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -46,8 +46,18 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter Name" />
+                        <label for="sub_compnay_id" class="form-label">Sub Company</label>
+                        <select class="form-select" id="sub_compnay_id">
+                            <option value="">Select  Sub Company</option>
+                            @foreach ($subcompany as $subcomp)
+                                <option value="{{$subcomp->id}}">{{$subcomp->name}}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="full_name" class="form-label">Name</label>
+                        <input type="text" id="full_name" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -68,7 +78,7 @@
                     <div class="col-md-12 mb-3">
                         <label for="state" class="form-label">State</label>
                         <select class="form-select" id="state">
-                            <option selected>Select  State</option>
+                            <option value="">Select  State</option>
                             @foreach ($states as $state)
                                 <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
                             @endforeach
@@ -78,14 +88,14 @@
                     <div class="col-md-12 mb-3">
                         <label for="city" class="form-label">City</label>
                         <select class="form-select" id="city">
-                            <option selected>Select  City</option>
+                            <option value="">Select  City</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="zipcode" class="form-label">Pincode</label>
                         <select class="form-select" id="zipcode">
-                            <option selected>Select  Pincode</option>
+                            <option value="">Select  Pincode</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
@@ -115,6 +125,16 @@
 
             <div class="modal-body">
                 <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="edit_sub_company" class="form-label">Sub Company</label>
+                        <select class="form-select" id="edit_sub_company">
+                            <option selected>Select  Sub Company</option>
+                            @foreach ($subcompany as $subcomp)
+                                <option value="{{$subcomp->id}}">{{$subcomp->name}}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
                     <div class="col-md-12 mb-3">
                         <input type="hidden" id="compid">
                         <label for="name" class="form-label">Name</label>
@@ -187,7 +207,7 @@
         },
         columns: [
             { data: "full_name" }, // Column for vendor's full name
-            { data: "gst_no" }, // Column for vendor's GST number
+            { data: "sub_company_name" }, // Column for vendor's GST number
             { data: "address" }, // Column for vendor's address
             {
                 data: "status", // Column for status (Active/Inactive)
@@ -222,7 +242,8 @@
 
         // Collect form data
         let data = {
-            full_name: $('#name').val(),
+            full_name: $('#full_name').val(),
+            sub_compnay_id:$('#sub_compnay_id').val(),
             email: $('#email').val(),
             phone: $('#phone').val(),
             city: $('#city').val(),
@@ -243,6 +264,7 @@
             type: 'POST',
             data: data,
             success: function (response) {
+                console.log(response);
                 if (response.success) {
                     setFlash("success", response.message); // Show success message
                     $('#addModal').modal('hide'); // Close modal after successful save
@@ -288,6 +310,7 @@
                 $('#editphone').val(user.phone);
                 $('#editcity').val(user.city);
                 $('#editstate').val(user.state);
+                $('#edit_sub_company').val(user.sub_compnay_id);
                 $('#editgst').val(user.gst_no);
                 $('#editzipcode').val(user.zipcode);
                 $('#editaddress').val(user.address);
@@ -324,6 +347,7 @@
                 full_name: $('#editname').val(),
                 email: $('#editemail').val(),
                 phone: $('#editphone').val(),
+                sub_compnay_id:$('#edit_sub_company').val(),
                 city: $('#editcity').val(),
                 state: $('#editstate').val(),
                 gst_no: $('#editgst').val(),

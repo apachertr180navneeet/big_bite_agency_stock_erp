@@ -35,8 +35,8 @@
 				<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
 					data-bs-toggle="dropdown">
 					<div class="avatar avatar-online">
-						@if(!empty($user->avatar) && file_exists(public_path('/').$user->avatar))
-                            <img src="{{asset($user->avatar)}}" alt="User Image" class="w-px-40 h-auto rounded-circle">
+						@if(!empty(Auth::user()->avatar) && file_exists(public_path('/').Auth::user()->avatar))
+                            <img src="{{asset(Auth::user()->avatar)}}" alt="User Image" class="w-px-40 h-auto rounded-circle">
                         @else
                             <img src="{{asset('assets/admin/img/avatars/1.png')}}"  alt="User Image" class="w-px-40 h-auto rounded-circle">
                         @endif
