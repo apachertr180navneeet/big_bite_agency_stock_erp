@@ -9,7 +9,8 @@ use App\Models\{
         Variation,
         Item,
         Tax,
-        StockReport
+        StockReport,
+        SubCompany
     };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
@@ -29,8 +30,9 @@ class ItemController extends Controller
 
         $variation = Variation::where('company_id',$compId)->where('status','active')->orderBy('id', 'desc')->get();
         $taxs = Tax::where('company_id',null)->where('status','active')->orderBy('id', 'desc')->get();
+        $subcompanys = SubCompany::where('company_id',$compId)->where('status','active')->orderBy('id', 'desc')->get();
         // Pass the company and comId to the view
-        return view('company.item.index', compact('variation','taxs'));
+        return view('company.item.index', compact('variation','taxs','subcompanys'));
     }
 
     /**
@@ -46,8 +48,9 @@ class ItemController extends Controller
         $compId = $user->company_id;
 
         $items = Item::join('variations', 'items.variation_id', '=', 'variations.id')
+        ->join('sub_company','items.sub_compnay_id','=','sub_company.id')
         ->where('items.company_id',$compId)
-        ->select('items.*', 'variations.name as variation_name')
+        ->select('items.*', 'variations.name as variation_name' , 'sub_company.name as sub_company_name')
         ->get();
 
         return response()->json(['data' => $items]);
@@ -102,6 +105,7 @@ class ItemController extends Controller
             'name' => 'required|string',
             'description' => 'required',
             'variation_id' => 'required',
+            'sub_comapny' => 'required',
             'tax_id' => 'required',
             'hsn_hac' => 'required|unique:items,hsn_hac',
             'opening_stock' => 'required',
@@ -125,6 +129,7 @@ class ItemController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'variation_id' => $request->variation_id,
+            'sub_compnay_id' => $request->sub_comapny,
             'tax_id' => $request->tax_id,
             'hsn_hac' => $request->hsn_hac,
             'company_id' =>  $compId
@@ -149,8 +154,14 @@ class ItemController extends Controller
 
         $stockReport = StockReport::where('item_id', $id)->first();
 
+        // Retrieve cities based on state id
+        $categories = Variation::where('sub_compnay_id', $user->sub_compnay_id)->get(['id', 'name']);
+
         $user->quantity = $stockReport->quantity;
-        return response()->json($user);
+        return response()->json([
+            'user' => $user,
+            'categories' => $categories,
+        ]);
     }
 
     // Update user data
@@ -160,6 +171,7 @@ class ItemController extends Controller
             'name' => 'required|string',
             'description' => 'required',
             'variation_id' => 'required',
+            'sub_compnay_id' => 'required',
             'id' => 'required|integer|exists:items,id', // Adjust as needed
             'hsn_hac' => 'required',
             'hsn_hac' => [
@@ -181,10 +193,10 @@ class ItemController extends Controller
                     'quantity' => $request->stock,
                 ]);
             }
-            return response()->json(['success' => true , 'message' => 'User Update Successfully']);
+            return response()->json(['success' => true , 'message' => 'Item Update Successfully']);
         }
 
-        return response()->json(['success' => false, 'message' => 'User not found']);
+        return response()->json(['success' => false, 'message' => 'Item not found']);
     }
 
 }

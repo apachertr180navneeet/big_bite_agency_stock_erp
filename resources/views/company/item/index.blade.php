@@ -22,6 +22,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Variation</th>
+                                    <th>Sub Comapany</th>
                                     <th>HSN/HAC</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -56,12 +57,19 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="variation_id" class="form-label">variation</label>
+                        <label for="sub_comapny" class="form-label">Sub Company</label>
+                        <select id="sub_comapny" class="form-select form-select">
+                            <option value="">select</option>
+                            @foreach ( $subcompanys as $subcompany )
+                                <option value="{{ $subcompany->id }}" data-id="{{$subcompany->id}}">{{ $subcompany->name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="variation_id" class="form-label">Category</label>
                         <select id="variation_id" class="form-select form-select">
                             <option value="">select</option>
-                            @foreach ( $variation as $var )
-                                <option value="{{ $var->id }}">{{ $var->name }}</option>
-                            @endforeach
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
@@ -117,12 +125,19 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="variation_id" class="form-label">variation</label>
-                        <select id="editvariation_id" class="form-select form-select">
+                        <label for="edit_sub_comapny" class="form-label">Sub Company</label>
+                        <select id="edit_sub_comapny" class="form-select form-select">
                             <option value="">select</option>
-                            @foreach ( $variation as $var )
-                                <option value="{{ $var->id }}">{{ $var->name }}</option>
+                            @foreach ( $subcompanys as $subcompany )
+                                <option value="{{ $subcompany->id }}" data-id="{{$subcompany->id}}">{{ $subcompany->name }}</option>
                             @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="edit_variation_id" class="form-label">Category</label>
+                        <select id="edit_variation_id" class="form-select form-select">
+                            <option value="">select</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
@@ -173,6 +188,9 @@
                     data: "variation_name",
                 },
                 {
+                    data: "sub_company_name",
+                },
+                {
                     data: "hsn_hac",
                 },
                 {
@@ -210,6 +228,7 @@
                 name: $('#name').val(),
                 description: $('#description').val(),
                 variation_id: $('#variation_id').val(),
+                sub_comapny: $('#sub_comapny').val(),
                 hsn_hac : $('#hsn_hac').val(),
                 tax_id: $('#tax_id').val(),
                 opening_stock: $('#opening_stock').val(),
@@ -257,14 +276,28 @@
                 url: url, // Update this URL to match your route
                 method: 'GET',
                 success: function(data) {
+                    console.log(data);
+                    const user = data.user;
+                    const categories = data.categories;
                     // Populate modal fields with the retrieved data
-                    $('#compid').val(data.id);
-                    $('#editname').val(data.name);
-                    $('#editdescription').val(data.description);
-                    $('#editvariation_id').val(data.variation_id);
-                    $('#edithsn_hac').val(data.hsn_hac);
-                    $('#edittax_id').val(data.tax_id);
-                    $('#editopening_stock').val(data.quantity);
+                    $('#compid').val(user.id);
+                    $('#editname').val(user.name);
+                    $('#editdescription').val(user.description);
+                    $('#edit_sub_comapny').val(user.sub_compnay_id);
+                    $('#edit_variation_id').val(user.variation_id);
+                    $('#edithsn_hac').val(user.hsn_hac);
+                    $('#edittax_id').val(user.tax_id);
+                    $('#editopening_stock').val(user.quantity);
+
+                    // Populate the variation/category dropdown
+                    $('#edit_variation_id').empty().append('<option selected>Select Category</option>');
+                    categories.forEach(category => {
+                        $('#edit_variation_id').append(`
+                            <option value="${category.id}" ${user.variation_id === category.id ? 'selected' : ''}>
+                                ${category.name}
+                            </option>
+                        `);
+                    });
 
                     // Open the modal
                     $('#editModal').modal('show');
@@ -286,7 +319,8 @@
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(),
                     description: $('#editdescription').val(),
-                    variation_id: $('#editvariation_id').val(),
+                    sub_compnay_id: $('#edit_sub_comapny').val(),
+                    variation_id: $('#edit_variation_id').val(),
                     hsn_hac: $('#edithsn_hac').val(),
                     tax_id: $('#edittax_id').val(),
                     stock: $('#editopening_stock').val(),
@@ -381,8 +415,8 @@
             });
         };
 
-         // Flash message function using Toast.fire
-         function setFlash(type, message) {
+        // Flash message function using Toast.fire
+        function setFlash(type, message) {
             Toast.fire({
                 icon: type,
                 title: message
@@ -393,6 +427,37 @@
         window.updateUserStatus = updateUserStatus;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
+    });
+
+    $(document).ready(function () {
+        // Trigger when state is changed in the 'Add Vendor' modal
+        $('#sub_comapny').on('change', function () {
+            let categoryId = $('#sub_comapny').find(':selected').attr('data-id');
+            fetchCategory(categoryId, $('#variation_id')); // Fetch cities based on selected state
+        });
+
+        // Trigger when state is changed in the 'Edit Vendor' modal
+        $('#edit_sub_comapny').on('change', function () {
+            let subcompanyId = $('#edit_sub_comapny').find(':selected').attr('data-id');
+            fetchCategory(subcompanyId, $('#edit_variation_id')); // Fetch cities based on selected state
+        });
+
+        // Function to fetch Category based on Sub Company ID
+        function fetchCategory(categoryId, categoryElement) {
+            if (categoryId) {
+                $.ajax({
+                    url: '{{ route("ajax.getCategory", "") }}/' + categoryId, // Fetch category based on Sub Company ID
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        categoryElement.empty().append('<option selected>Select Category</option>');
+                        $.each(data, function (key, value) {
+                            categoryElement.append('<option value="' + value.id + '" data-id="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
+                });
+            }
+        }
     });
 
 </script>

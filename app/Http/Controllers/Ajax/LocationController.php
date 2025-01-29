@@ -12,7 +12,8 @@ use App\Models\{
     city,
     State,
     Pincode,
-    StockReport
+    StockReport,
+    SubCompany,
 };
 
 class LocationController extends Controller
@@ -68,5 +69,12 @@ class LocationController extends Controller
             return response()->json($zipcodes);
         }
         return response()->json([], 404); // Return empty if city not found
+    }
+
+    // Manage to get category by sub company
+    public function getCategory($sub_company)
+    {
+        $categories = Variation::where('sub_compnay_id', $sub_company)->get(['id', 'name']);
+        return response()->json($categories);
     }
 }
