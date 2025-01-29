@@ -48,7 +48,7 @@ class VendorController extends Controller
         ->where('users.role', 'vendor')
         ->where('users.company_id', $compId)->select('users.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
         ->orderBy('users.id', 'desc')
-        ->get();;
+        ->get();
 
         return response()->json(['data' => $items]);
     }
