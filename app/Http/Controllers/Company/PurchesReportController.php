@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, PurchesBook, PurchesBookItem, Company,Bank};
+use App\Models\{User, PurchesBook, PurchesBookItem, Company,Bank,SubCompany};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -84,12 +84,14 @@ class PurchesReportController extends Controller
             ->select('purches_books.*', 'users.full_name as vendor_name', 'users.address as vendor_address', 'users.city as vendor_city', 'users.state as vendor_state', 'users.gst_no as vendor_gst_no', 'users.phone as vendor_phone')
             ->find($id);
 
+        $subCompany = SubCompany::find($purchaseReport->sub_compnay_id);
+
         $bank = Bank::where('company_id', $compId)->where('show_invoice', '1')->first();
 
         $grand_total = $purchaseReport->grand_total;
         $grandtotalwrod = $this->convertNumberToWords($grand_total); // Use $this-> for method call
 
-        return view('company.purches_report.print', compact('purchaseReport', 'grandtotalwrod', 'bank'));
+        return view('company.purches_report.print', compact('purchaseReport', 'grandtotalwrod', 'bank','subCompany'));
     }
 
     public function convertNumberToWords($num) {

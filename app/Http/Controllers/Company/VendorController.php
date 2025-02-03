@@ -156,7 +156,7 @@ class VendorController extends Controller
             'state' => $request->state,
             'zipcode' => $request->zipcode,
             'city' => $request->city,
-            'role' => $request->role,
+            'role' => 'vendor',
             'gst_no' =>  $request->gst,
             'company_id' => $compId,
             'password' => Hash::make('12345678'),

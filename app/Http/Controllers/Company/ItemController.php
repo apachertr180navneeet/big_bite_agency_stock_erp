@@ -132,6 +132,7 @@ class ItemController extends Controller
             'sub_compnay_id' => $request->sub_comapny,
             'tax_id' => $request->tax_id,
             'hsn_hac' => $request->hsn_hac,
+            'opening_stock' => $request->opening_stock,
             'company_id' =>  $compId
         ];
         $item = Item::create($dataUser);

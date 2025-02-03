@@ -27,31 +27,31 @@
                             <!-- Date Field -->
                             <div class="col-md-6 mb-3">
                                 <label for="date" class="form-label">Date</label>
-                                <input class="form-control" type="date" id="date" name="date" value="{{ $purchaseBook->date }}" required>
+                                <input class="form-control" type="text" id="date" name="date" value="{{ \Carbon\Carbon::parse($purchaseBook->date)->format('d-m-Y') }}" readonly>
                                 <div id="date-error" class="text-danger"></div>
                             </div>
                             <!-- Invoice Field -->
                             <div class="col-md-6 mb-3">
                                 <label for="invoice" class="form-label">Invoice</label>
-                                <input type="text" class="form-control" id="invoice" name="invoice" value="{{ $purchaseBook->invoice_number }}" required>
+                                <input type="text" class="form-control" id="invoice" name="invoice" value="{{ $purchaseBook->invoice_number }}" readonly>
                                 <div id="invoice-error" class="text-danger"></div>
+                            </div>
+                            <!-- Transport Field -->
+                            <div class="col-md-6 mb-3">
+                                <label for="transport" class="form-label">Sub Company</label>
+                                <input type="text" class="form-control" id="sub_company" name="sub_company" value="{{ $subCompany->name }}" readonly>
+                                <div id="transport-error" class="text-danger"></div>
                             </div>
                             <!-- Vendor Field -->
                             <div class="col-md-6 mb-3">
                                 <label for="vendor" class="form-label">Vendor</label>
-                                <select class="form-select" id="vendor" name="vendor" required>
+                                <select class="form-select" id="vendor" name="vendor" required disabled>
                                     <option selected disabled>Select</option>
                                     @foreach ($vendors as $vendor)
                                         <option value="{{ $vendor->id }}" {{ $vendor->id == $purchaseBook->vendor_id ? 'selected' : '' }} data-state="{{ $vendor->state }}">{{ $vendor->full_name }}</option>
                                     @endforeach
                                 </select>
                                 <div id="vendor-error" class="text-danger"></div>
-                            </div>
-                            <!-- Transport Field -->
-                            <div class="col-md-6 mb-3">
-                                <label for="transport" class="form-label">Transport</label>
-                                <input type="text" class="form-control" id="transport" name="transport" value="{{ $purchaseBook->transport }}">
-                                <div id="transport-error" class="text-danger"></div>
                             </div>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
                             </div>
                             <div class="col-md-2 mb-3"></div>
                             <div class="col-md-4 mb-3">
-                                <input type="number" class="form-control" id="other_expense" value="{{ number_format($purchaseBook->other_expense, 2, '.', '') }}" min="0" name="other_expense">
+                                <input type="number" class="form-control" id="other_expense" value="{{ number_format($purchaseBook->other_expense, 2, '.', '') }}" min="0" name="other_expense" readonly>
                                 <div id="other_expense-error" class="text-danger"></div>
                             </div>
                         </div>
@@ -161,7 +161,7 @@
                             </div>
                             <div class="col-md-2 mb-3"></div>
                             <div class="col-md-4 mb-3">
-                                <input type="number" class="form-control" id="discount" name="discount" min="0" value="{{ number_format($purchaseBook->discount, 2, '.', '') }}">
+                                <input type="number" class="form-control" id="discount" name="discount" min="0" value="{{ number_format($purchaseBook->discount, 2, '.', '') }}" readonly>
                                 <div id="discount-error" class="text-danger"></div>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                             </div>
                             <div class="col-md-2 mb-3"></div>
                             <div class="col-md-4 mb-3">
-                                <input type="number" class="form-control" id="round_off" name="round_off" value="{{ number_format($purchaseBook->round_off, 2, '.', '') }}" step="any">
+                                <input type="number" class="form-control" id="round_off" name="round_off" value="{{ number_format($purchaseBook->round_off, 2, '.', '') }}" step="any" readonly>
                                 <div id="round_off-error" class="text-danger"></div>
                             </div>
                         </div>
@@ -195,7 +195,7 @@
                                 <label for="given_amount" class="form-label text-end">Given Amount</label>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <input type="number" class="form-control" id="given_amount" name="given_amount" value="{{ number_format($purchaseBook->given_amount, 2, '.', '') }}" min="0">
+                                <input type="number" class="form-control" id="given_amount" name="given_amount" value="{{ number_format($purchaseBook->given_amount, 2, '.', '') }}" min="0" readonly>
                                 @error('given_amount')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror

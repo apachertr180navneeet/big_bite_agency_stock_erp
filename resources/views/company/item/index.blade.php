@@ -21,7 +21,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Variation</th>
+                                    <th>Category</th>
                                     <th>Sub Comapany</th>
                                     <th>HSN/HAC</th>
                                     <th>Status</th>

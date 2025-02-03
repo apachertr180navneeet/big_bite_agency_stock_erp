@@ -31,6 +31,7 @@
                                     Logo
                                 </span>
                             </div>
+                            <p class="mb-1">Company Name :- {{ $subCompany->name  }} </p>
                             <p class="mb-1">Bill From :- {{ $purchaseReport->vendor_name  }} </p>
                             <p class="mb-1">Address</p>
                             <p class="mb-0">{{ $purchaseReport->vendor_address }} {{ $purchaseReport->vendor_city }} {{ $purchaseReport->vendor_state }} ({{ $purchaseReport->vendor_phone }})</p>

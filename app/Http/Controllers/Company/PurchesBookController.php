@@ -267,6 +267,9 @@ class PurchesBookController extends Controller
 
         $purchaseBook = PurchesBook::with('purchesbookitem.item.variation')->find($id);
 
+        $subCompany = SubCompany::find($purchaseBook->sub_compnay_id);
+
+
         // Fetch all active vendors for the user's company
         $vendors = User::where('role', 'vendor')
             ->where('company_id', $compId)
@@ -280,7 +283,7 @@ class PurchesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState'));
+        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState','subCompany'));
     }
 
     public function update(Request $request, $id)

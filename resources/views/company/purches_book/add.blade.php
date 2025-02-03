@@ -111,7 +111,6 @@
                                 <thead>
                                     <tr>
                                         <th>S. No.</th>
-                                        <th>Category</th>
                                         <th>Item</th>
                                         <th>Quantity</th>
                                         <th>HSN</th>
@@ -380,11 +379,10 @@
                     const row = `
                     <tr>
                         <td>${itemCount}</td>
-                        <td>${category}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
                         <td>${item}<input type="hidden" name="items[]" value="${itemId}"></td>
                         <td>${qty}<input type="hidden" name="quantities[]" value="${qty}"></td>
                         <td>${hsn}</td>
-                        <td>${variation}</td>
+                        <td>${variation}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
                         <td>${amountPerUnit.toFixed(2)}<input type="hidden" name="rates[]" value="${amountPerUnit.toFixed(2)}"></td>
                         <td>${taxRate} %<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
                         <td>${totalAmount.toFixed(2)}<input type="hidden" name="totalAmounts[]" value="${totalAmount.toFixed(2)}"></td>

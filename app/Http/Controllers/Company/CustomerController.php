@@ -154,7 +154,7 @@ class CustomerController extends Controller
             'state' => $request->state,
             'city' => $request->city,
             'zipcode' => $request->zipcode,
-            'role' => $request->role,
+            'role' => 'customer',
             'company_id' => $compId,
             'gst_no' =>  $request->gst,
             'password' => Hash::make('12345678'),

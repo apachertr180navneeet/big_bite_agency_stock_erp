@@ -71,21 +71,21 @@
         </li>
 
          {{--  Report menu  --}}
-         {{--  <li class="menu-item {{ request()->routeIs(['company.purches.report.*', 'company.sales.report.*', 'company.receipt.report.*', 'company.payment.report.*', 'company.payment.report.*', 'company.stock.report.*', 'company.gst.report.*']) ? 'active open' : '' }}">
+         <li class="menu-item {{ request()->routeIs(['company.purches.report.*', 'company.sales.report.*', 'company.receipt.report.*', 'company.payment.report.*', 'company.payment.report.*', 'company.stock.report.*', 'company.gst.report.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div class="text-truncate" data-i18n="Master">Report</div>
             </a>
             <ul class="menu-sub">
                 @foreach([
-                    ['route' => 'company.purches.report.index', 'text' => 'Purchase Report'],
-                    ['route' => 'company.sales.report.index', 'text' => 'Sales Report'],
-                    ['route' => 'company.receipt.report.index', 'text' => 'Receipt Book Report'],
-                    ['route' => 'company.payment.report.index', 'text' => 'Payment Book Report'],
-                    ['route' => 'company.contra.report.index', 'text' => 'Contra Report'],
-                    ['route' => 'company.bank.and.cash.report.bankindex', 'text' => 'Bank And Cash Report'],
+                    //['route' => 'company.purches.report.index', 'text' => 'Purchase Report'],
+                    //['route' => 'company.sales.report.index', 'text' => 'Sales Report'],
+                    //['route' => 'company.receipt.report.index', 'text' => 'Receipt Book Report'],
+                    //['route' => 'company.payment.report.index', 'text' => 'Payment Book Report'],
+                    //['route' => 'company.contra.report.index', 'text' => 'Contra Report'],
+                    //['route' => 'company.bank.and.cash.report.bankindex', 'text' => 'Bank And Cash Report'],
                     ['route' => 'company.stock.report.index', 'text' => 'Stock Report'],
-                    ['route' => 'company.gst.report.index', 'text' => 'GST Report'],
+                    //['route' => 'company.gst.report.index', 'text' => 'GST Report'],
                 ] as $reportmenu)
                     <li class="menu-item {{ request()->routeIs($reportmenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($reportmenu['route']) }}" class="menu-link">
@@ -95,7 +95,7 @@
                     </li>
                 @endforeach
             </ul>
-        </li>  --}}
+        </li>
 
 
 
