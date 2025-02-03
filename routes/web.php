@@ -313,6 +313,7 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::get('/get-vendors/{sub_company_id}', 'getVendors')->name('getVendors');
         Route::get('/get-categories/{sub_company_id}', 'getCategories')->name('getCategories');
         Route::get('/get-items/{category_id}', 'getItems')->name('getItems');
+        Route::get('/get-customers/{sub_compnay_id}', 'getCustomers')->name('getCustomers');
     });
 });
 

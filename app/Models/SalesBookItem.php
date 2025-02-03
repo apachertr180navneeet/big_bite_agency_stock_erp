@@ -18,7 +18,7 @@ class SalesBookItem extends Model
      * @var array
      */
     protected $fillable = [
-        'sales_book_id', 'item_id', 'quantity', 'rate', 'tax', 'amount', 'status', 'sreturn' // Add all the attributes you want to be mass assignable
+        'sales_book_id','category', 'item_id', 'quantity', 'rate', 'tax', 'amount', 'status', 'sreturn' // Add all the attributes you want to be mass assignable
     ];
 
 

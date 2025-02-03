@@ -98,4 +98,11 @@ class LocationController extends Controller
         $items = Item::with(['variation:id,name', 'tax:id,rate'])->where('variation_id', $category_id)->get(['id', 'name', 'tax_id' , 'company_id' , 'variation_id', 'hsn_hac']);
         return response()->json($items);
     }
+
+    public function getCustomers($sub_company_id)
+    {
+        $customers = User::where('sub_compnay_id', $sub_company_id)->where('role', 'customer')->where('status', 'active')->get();
+
+        return response()->json($customers);
+    }
 }

@@ -46,34 +46,32 @@
                                     <input type="text" class="form-control" id="dispatch" name="dispatch"
                                         value="{{ $invoiceNumber }}" readonly>
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="sub_compnay_id" class="form-label">Sub Comapny</label>
+                                    <select class="form-select" id="sub_compnay_id" name="sub_compnay_id" required>
+                                        <option value="">Select</option>
+                                        @foreach ($subComapnys as $subComapny)
+                                            <option value="{{ $subComapny->id }}"
+                                                {{ old('sub_compnay_id') == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('sub_compnay_id')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
                                 <!-- customer Field -->
                                 <div class="col-md-6 mb-3">
                                     <label for="customer" class="form-label">Customer</label>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">+ Add Customer</button>
                                     <select class="form-select" id="customer" name="customer">
                                         <option value="">Select</option>
-                                        @foreach ($customers as $customer)
-                                            <option value="{{ $customer->id }}"
-                                                {{ old('customer') == $customer->id ? 'selected' : '' }}
-                                                data-state="{{ $customer->state }}">{{ $customer->full_name }}</option>
-                                        @endforeach
+                                        
                                     </select>
-                                </div>
-                                <!-- Transport Field -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Place Of Supply</label>
-                                    <input type="text" class="form-control" id="weight" name="weight"
-                                        value="{{ old('weight') }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Transport</label>
-                                    <input type="text" class="form-control" id="transport" name="transport"
-                                        value="{{ old('transport') }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Vehicle No.</label>
-                                    <input type="text" class="form-control" id="vehicle_no" name="vehicle_no"
-                                        value="{{ old('vehicle_no') }}">
+                                    <input type="hidden" class="form-control" id="weight" name="weight"
+                                        value="0">
+                                    <input type="hidden" class="form-control" id="transport" name="transport"
+                                        value="0">
+                                    <input type="hidden" class="form-control" id="vehicle_no" name="vehicle_no"
+                                        value="0">
                                 </div>
                             </div>
                         </div>
@@ -83,14 +81,18 @@
                             <div class="row">
                                 <!-- Item Selection -->
                                 <div class="col-md-3 mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category">
+                                        <option selected>Select</option>
+                                    </select>
+                                    <div id="item_error" class="text-danger"></div>
+                                </div>
+                                <div class="col-md-3 mb-3">
                                     <label for="item" class="form-label">Item</label>
                                     <select class="form-select" id="item">
-                                        <option value="">Select</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->id }}" data-tax="{{ $item->tax_rate }}"
-                                                data-variation="{{ $item->variation_name }}" data-hsn="{{ $item->hsn_hac }}">{{ $item->name }}</option>
-                                        @endforeach
+                                        <option selected>Select</option>
                                     </select>
+                                    <div id="item_error" class="text-danger"></div>
                                 </div>
                                 <!-- Quantity Field -->
                                 <div class="col-md-3 mb-3">
@@ -116,7 +118,7 @@
                                         <th>Item</th>
                                         <th>Quantity</th>
                                         <th>HSN</th>
-                                        <th>Variation</th>
+                                        <th>Category</th>
                                         <th>Rate</th>
                                         <th>Tax</th>
                                         <th>Total Amount</th>
@@ -255,6 +257,27 @@
                                     @enderror
                                 </div>
                             </div>
+
+                            <!-- Payment Type -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="payment_type" class="form-label text-end">Payment Type </label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select class="form-select" id="payment_type" name="payment_type" required>
+                                        <option value="">Select</option>
+                                        <option value="UPI">UPI</option>
+                                        <option value="RTGS">RTGS</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Cheque">Cheque</option>
+                                    </select>
+                                    @error('payment_type')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                            </div>
                         </div>
 
                         <!-- Save Button -->
@@ -265,77 +288,6 @@
                 </div>
             </div>
         </form>
-    </div>
-
-    <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel1">Customer Add</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" id="name" class="form-control" placeholder="Enter Name" />
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" class="form-control" placeholder="xxxx@xxx.xx" />
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" id="phone" class="form-control" placeholder="" />
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <textarea class="form-control" id="address"name="address" rows="3"></textarea>
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="state" class="form-label">State</label>
-                            <select class="form-select" id="state">
-                                <option selected>Select  State</option>
-                                @foreach ($states as $state)
-                                    <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
-                                @endforeach
-                            </select>
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="city" class="form-label">City</label>
-                            <select class="form-select" id="city">
-                                <option selected>Select  City</option>
-                            </select>
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="zipcode" class="form-label">Pincode</label>
-                            <select class="form-select" id="zipcode">
-                                <option selected>Select  Pincode</option>
-                            </select>
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="gst" class="form-label">GST No.</label>
-                            <input type="text" id="gst" class="form-control" placeholder="" />
-                            <small class="error-text text-danger"></small>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <input type="hidden" id="role" value="customer">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="AddItem">Save</button>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 
@@ -393,6 +345,8 @@
 
             // Add item to the table
             $('#addItem').on('click', function() {
+                const category = $('#category option:selected').text();
+                const categoryId = $('#category').val();
                 const item = $('#item option:selected').text();
                 const itemId = $('#item').val();
                 const variation = $('#item option:selected').data('variation');
@@ -439,7 +393,7 @@
                                             <td>${item}<input type="hidden" name="items[]" value="${itemId}"></td>
                                             <td>${qty}<input type="hidden" name="quantities[]" value="${qty}"></td>
                                             <td>${hsn}</td>
-                                            <td>${variation}</td>
+                                            <td>${variation}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
                                             <td>${amountPerUnit.toFixed(2)}<input type="hidden" name="rates[]" value="${amountPerUnit.toFixed(2)}"></td>
                                             <td>${taxRate}%<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
                                             <td>${totalAmount.toFixed(2)}<input type="hidden" name="totalAmounts[]" value="${totalAmount.toFixed(2)}"></td>
@@ -466,6 +420,7 @@
 
                         // Clear input fields after adding item
                         $('#item').val('').trigger('change');
+                        $('#category').val('').trigger('change');
                         $('#qty').val('');
                         $('#amount').val('');
                     }
@@ -726,6 +681,87 @@
                             }
                         });
                     }
+                }
+            });
+        });
+
+        // Get Customer from sub company
+        $(document).ready(function () {
+            $('#sub_compnay_id').on('change', function () {
+                let subCompanyId = $(this).val();
+                let vendorDropdown = $('#customer');
+                let categoryDropdown = $('#category');
+                
+                if (subCompanyId) {
+                    // Define URLs dynamically using template literals
+                    let customerUrl = '/ajax/get-customers/' + subCompanyId;
+                    let categoryUrl = '/ajax/get-categories/' + subCompanyId;
+                
+                    // Fetch Vendors
+                    $.ajax({
+                        url: customerUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (datavendor) {
+                            vendorDropdown.empty().append('<option value="">Select</option>');
+                            $.each(datavendor, function (index, vendor) {
+                                vendorDropdown.append(`<option value="${vendor.id}" data-state="${vendor.state}">${vendor.full_name}</option>`);
+                            });
+                        }
+                    });
+            
+                    // Fetch Categories
+                    $.ajax({
+                        url: categoryUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            categoryDropdown.empty().append('<option value="">Select</option>');
+                            $.each(data, function (index, category) {
+                                categoryDropdown.append(`<option value="${category.id}">${category.name}</option>`);
+                            });
+                        }
+                    });
+                } else {
+                    // Reset dropdowns if no sub-company is selected
+                    vendorDropdown.empty().append('<option value="">Select</option>');
+                    categoryDropdown.empty().append('<option value="">Select</option>');
+                }
+            });
+        });        
+
+        // Get Item by category
+        $(document).ready(function () {
+            $('#category').on('change', function () {
+                let categoryId = $(this).val();
+                let itemDropdown = $('#item');
+        
+                // Define the route with a placeholder and replace it dynamically
+                let itemUrl = @json(route('ajax.getItems', ['category_id' => '__ID__']));
+        
+                if (categoryId) {
+                    $.ajax({
+                        url: itemUrl.replace('__ID__', categoryId),
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            itemDropdown.empty().append('<option selected>Select</option>');
+                            $.each(data, function (index, item) {
+                                itemDropdown.append(`
+                                            <option 
+                                                value="${item.id}" 
+                                                data-tax="${item.tax.rate}" 
+                                                data-variation="${item.variation.name}" 
+                                                data-hsn="${item.hsn_hac}">
+                                                ${item.name}
+                                            </option>
+                                        `);
+                            });
+                        }
+                    });
+                } else {
+                    // Reset item dropdown if no category is selected
+                    itemDropdown.empty().append('<option selected>Select</option>');
                 }
             });
         });

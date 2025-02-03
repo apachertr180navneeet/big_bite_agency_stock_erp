@@ -19,7 +19,7 @@ class SalesBook extends Model
      * @var array
      */
     protected $fillable = [
-        'date', 'dispatch_number', 'customer_id', 'transport', 'igst', 'sgst','cgst', 'other_expense', 'discount', 'round_off', 'grand_total' , 'status' , 'company_id', 'item_weight','amount_before_tax','recived_amount','balance_amount','transport','vehicle_no'  // Add all the attributes you want to be mass assignable
+        'date', 'dispatch_number', 'customer_id', 'transport', 'igst', 'sgst','cgst', 'other_expense', 'discount', 'round_off', 'grand_total' , 'status' , 'company_id', 'item_weight','amount_before_tax','recived_amount','balance_amount','transport','vehicle_no' ,'transport','vehicle_no' ,'sub_compnay_id','payment_type'  // Add all the attributes you want to be mass assignable
     ];
 
     // Other model code...

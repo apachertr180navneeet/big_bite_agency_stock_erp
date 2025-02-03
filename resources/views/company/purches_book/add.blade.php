@@ -266,6 +266,8 @@
                                     @enderror
                                 </div>
                             </div>
+
+                            <!-- Payment Type -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
                                 <div class="col-md-5 mb-3">

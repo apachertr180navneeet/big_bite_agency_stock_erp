@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, Company, Tax, Item, SalesBook, SalesBookItem, StockReport, State};
+use App\Models\{User, Company, Tax, Item, SalesBook, SalesBookItem, StockReport, State, SubCompany};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -53,8 +53,9 @@ class SalesBookController extends Controller
 
         // Fetch all sales books for the user's company, including vendor details
         $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
+            ->join('sub_company', 'sales_books.sub_compnay_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
-            ->select('sales_books.*', 'users.full_name as customer_name')
+            ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
             ->orderByDesc('sales_books.id')
             ->get();
 
@@ -95,53 +96,45 @@ class SalesBookController extends Controller
         // Get the current date
         $currentDate = Carbon::now()->format('d/m/Y'); // DD/MM/YYYY format
 
+        // Get the active sub companies
+        $activeSubComapny = SubCompany::where([
+            ['company_id', $compId],
+            ['status', 'active']
+        ])->get();
 
-        // Fetch all active vendors for the user's company
-        $customers = User::where('role', 'customer')
-            ->where('company_id', $compId)
-            ->where('status', 'active')
-            ->get();
-
-        // Fetch all items with their variations and tax details for the user's company
-        $companyItems = Item::join('variations', 'items.variation_id', '=', 'variations.id')
-            ->join('taxes', 'items.tax_id', '=', 'taxes.id')
-            ->where('items.company_id', $compId)
-            ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
-            ->get();
 
         $states = State::all();
 
         // Pass the vendors and items data to the view for adding a new sales book
         return view('company.sales_book.add', [
-            'customers' => $customers,
-            'items' => $companyItems,
             'invoiceNumber' => $finalInvoiceNumber,
             'currentDate' => $currentDate,
             'companyState' => $companyState,
-            'states' => $states
+            'states' => $states,
+            'subComapnys' => $activeSubComapny
         ]);
     }
 
     public function store(Request $request)
     {
-        // Validate the request data
-        $request->validate([
-            'date' => 'required',
-            'dispatch' => 'required|string|max:255',
-            'customer' => 'required|exists:users,id',
-            'weight' => 'required',
-            'transport' => 'required',
-            'vehicle_no' => 'required',
-            'other_expense' => 'required|numeric',
-            'discount' => 'required|numeric',
-            'round_off' => 'required|numeric',
-            'grand_total' => 'required|numeric',
-            'items.*' => 'required|exists:items,id',
-            'quantities.*' => 'required|numeric|min:0',
-            'rates.*' => 'required|numeric|min:0',
-            'taxes.*' => 'required|numeric|min:0',
-            'totalAmounts.*' => 'required|numeric|min:0',
-        ]);
+        // // Validate the request data
+        // $request->validate([
+        //     'date' => 'required',
+        //     'dispatch' => 'required|string|max:255',
+        //     'customer' => 'required|exists:users,id',
+        //     'weight' => 'required',
+        //     'transport' => 'required',
+        //     'vehicle_no' => 'required',
+        //     'other_expense' => 'required|numeric',
+        //     'discount' => 'required|numeric',
+        //     'round_off' => 'required|numeric',
+        //     'grand_total' => 'required|numeric',
+        //     'items.*' => 'required|exists:items,id',
+        //     'quantities.*' => 'required|numeric|min:0',
+        //     'rates.*' => 'required|numeric|min:0',
+        //     'taxes.*' => 'required|numeric|min:0',
+        //     'totalAmounts.*' => 'required|numeric|min:0',
+        // ]);
 
         // Start a database transaction
         DB::beginTransaction();
@@ -157,6 +150,8 @@ class SalesBookController extends Controller
                 'company_id' => $compId,
                 'dispatch_number' => $request->dispatch,
                 'customer_id' => $request->customer,
+                'sub_compnay_id' => $request->sub_compnay_id,
+                'payment_type' => $request->payment_type,
                 'item_weight' => $request->weight,
                 'transport' => $request->transport,
                 'vehicle_no' => $request->vehicle_no,
@@ -177,6 +172,7 @@ class SalesBookController extends Controller
                 SalesBookItem::create([
                     'sales_book_id' => $salesBook->id,
                     'item_id' => $itemId,
+                    'category' => $request->categorys[$index],
                     'quantity' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
