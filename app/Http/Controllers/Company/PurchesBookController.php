@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State};
+use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State, SubCompany};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -51,8 +51,9 @@ class PurchesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
+            ->join('sub_company', 'purches_books.sub_compnay_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
-            ->select('purches_books.*', 'users.full_name as vendor_name')
+            ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
             ->orderByDesc('purches_books.id')
             ->get();
 
@@ -78,17 +79,10 @@ class PurchesBookController extends Controller
         $companyShortCode = $companyDetails->short_code;
         $companyState = $companyDetails->state;
 
-        // Fetch all active vendors associated with the user's company
-        $activeVendors = User::where([
-                ['role', 'vendor'],
-                ['company_id', $companyId],
-                ['status', 'active']
-            ])->get();
-
-        // Fetch items with their respective variations and tax details for the company
-        $companyItems = Item::with(['variation:id,name', 'tax:id,rate']) // Eager loading relationships for efficiency
-            ->where('company_id', $companyId)
-            ->get(['id', 'name', 'tax_id' , 'company_id' , 'variation_id', 'hsn_hac']); // Ensure proper field selection and eager loading
+        $activeSubComapny = SubCompany::where([
+            ['company_id', $companyId],
+            ['status', 'active']
+        ])->get();
 
         // Get the maximum invoice number for the company's purchases
         $latestInvoiceNumber = PurchesBook::where('company_id', $companyId)->max('invoice_number');
@@ -109,42 +103,16 @@ class PurchesBookController extends Controller
 
         // Return the view with the active vendors, items, and the generated invoice number
         return view('company.purches_book.add', [
-            'vendors' => $activeVendors,
-            'items' => $companyItems,
             'invoiceNumber' => $finalInvoiceNumber,
             'currentDate' => $currentDate,
             'companyState' => $companyState,
-            'states' => $states
+            'states' => $states,
+            'subComapnys' => $activeSubComapny
         ]);
     }
+    
     public function store(Request $request)
     {
-        // Validate the request data
-        $validatedData = $request->validate([
-            'date' => 'required|date',
-            'invoice' => 'required|string|max:255',
-            'vendor' => 'required|exists:users,id',
-            'transport' => 'required|string|max:255',
-            'igst' => 'required|numeric|min:0',
-            'cgst' => 'required|numeric|min:0',
-            'sgst' => 'required|numeric|min:0',
-            'other_expense' => 'required|numeric|min:0',
-            'discount' => 'required|numeric|min:0',
-            'round_off' => 'required|numeric',
-            'grand_total' => 'required|numeric|min:0',
-            'items' => 'required|array|min:1',
-            'items.*' => 'exists:items,id',
-            'quantities' => 'required|array|min:1',
-            'quantities.*' => 'required|numeric|min:1',
-            'rates' => 'required|array|min:1',
-            'rates.*' => 'required|numeric|min:0',
-            'taxes' => 'required|array|min:1',
-            'taxes.*' => 'required|numeric|min:0',
-            'totalAmounts' => 'required|array|min:1',
-            'totalAmounts.*' => 'required|numeric|min:0',
-        ]);
-
-        // Start a database transaction
         DB::beginTransaction();
 
         try {
@@ -156,6 +124,7 @@ class PurchesBookController extends Controller
             $purchesBook = PurchesBook::create([
                 'date' => $request->date,
                 'company_id' => $compId,
+                'sub_compnay_id' => $request->sub_compnay_id,
                 'invoice_number' => $request->invoice,
                 'vendor_id' => $request->vendor,
                 'transport' => $request->transport,
@@ -169,15 +138,16 @@ class PurchesBookController extends Controller
                 'amount_before_tax' => $request->amount_before_tax,
                 'given_amount' => $request->given_amount,
                 'remaining_blance' => $request->remaining_blance,
+                'payment_type' => $request->payment_type,
             ]);
 
             // Initialize an array to store the purchase book items
             $purchesBookItems = [];
-
             // Save each item in the purches_book_items table
             foreach ($request->items as $index => $itemId) {
                 $item = PurchesBookItem::create([
                     'purches_book_id' => $purchesBook->id,
+                    'category' => $request->categorys[$index],
                     'item_id' => $itemId,
                     'quantity' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
@@ -216,8 +186,8 @@ class PurchesBookController extends Controller
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollback();
-            dd($e);
-            // Redirect with an error message
+
+            // Redirect with an error message and old input
             return redirect()->back()->with('error', 'An error occurred while saving the purchase book entry.');
         }
     }

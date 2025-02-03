@@ -42,8 +42,8 @@
                                 <span class="fw-medium">{{ \Carbon\Carbon::parse($purchaseReport->date)->format('d-m-Y') }}</span>
                             </div>
                             <div>
-                                <span class="me-1">GST No.:</span>
-                                <span class="fw-medium">{{ $purchaseReport->vendor_gst_no }}</span>
+                                {{--  <span class="me-1">GST No.:</span>
+                                <span class="fw-medium">{{ $purchaseReport->vendor_gst_no }}</span>  --}}
                             </div>
                         </div>
                     </div>
@@ -76,15 +76,10 @@
                             </tr>
                             @endforeach
                             <tr>
-                                <td colspan="5" class="align-top px-4 py-5">
+                                <td colspan="3" class="align-top px-4 py-5">
                                     <span>{{ $grandtotalwrod}}</span>
-                                    <br>
-                                    <span>Bank :</span>
-                                    <span>Account Number :- {{$bank->account_number}}</span>
-                                    <span>IFSC Code :- {{$bank->ifsc_code}}</span>
-                                    <span>Bank Name :- {{$bank->bank_name}}</span>
                                 </td>
-                                <td class="text-end px-4 py-5">
+                                <td colspan="2" class="text-end px-4 py-5">
                                     <p class="mb-2">SUBTOTAL :</p>
                                     <p class="mb-2">Other Expenses(+):</p>
                                     <p class="mb-2">Discount(-):</p>
@@ -96,7 +91,7 @@
                                     <p class="mb-0">Given Amount:</p>
                                     <p class="mb-0">Remaining Balance :</p>
                                 </td>
-                                <td class="px-4 py-5">
+                                <td colspan="2" class="px-4 py-5">
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->amount_before_tax ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->other_expense ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->discount ?? 0), 2) }}</p>

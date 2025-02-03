@@ -79,104 +79,59 @@ class PurchesReportController extends Controller
         $user = Auth::user();
         $compId = $user->company_id;
 
-        $purchaseReport = PurchesBook::with('purchesbookitem.item.variation','purchesbookitem.item.tax')
-        ->join('users', 'purches_books.vendor_id', '=', 'users.id')
-        ->select('purches_books.*', 'users.full_name as vendor_name', 'users.address as vendor_address', 'users.city as vendor_city', 'users.state as vendor_state', 'users.gst_no as vendor_gst_no', 'users.phone as vendor_phone')
-        ->find($id);
+        $purchaseReport = PurchesBook::with('purchesbookitem.item.variation', 'purchesbookitem.item.tax')
+            ->join('users', 'purches_books.vendor_id', '=', 'users.id')
+            ->select('purches_books.*', 'users.full_name as vendor_name', 'users.address as vendor_address', 'users.city as vendor_city', 'users.state as vendor_state', 'users.gst_no as vendor_gst_no', 'users.phone as vendor_phone')
+            ->find($id);
 
         $bank = Bank::where('company_id', $compId)->where('show_invoice', '1')->first();
 
         $grand_total = $purchaseReport->grand_total;
-        $grandtotalwrod = $this->convertNumberToWords($grand_total);
+        $grandtotalwrod = $this->convertNumberToWords($grand_total); // Use $this-> for method call
 
-
-        return view('company.purches_report.print', compact('purchaseReport','grandtotalwrod','bank'));
+        return view('company.purches_report.print', compact('purchaseReport', 'grandtotalwrod', 'bank'));
     }
 
-    public function convertNumberToWords($number) {
-        $hyphen = '-';
-        $conjunction = ' and ';
-        $separator = ', ';
-        $negative = 'negative ';
-        $dictionary = [
-            0 => 'zero',
-            1 => 'one',
-            2 => 'two',
-            3 => 'three',
-            4 => 'four',
-            5 => 'five',
-            6 => 'six',
-            7 => 'seven',
-            8 => 'eight',
-            9 => 'nine',
-            10 => 'ten',
-            11 => 'eleven',
-            12 => 'twelve',
-            13 => 'thirteen',
-            14 => 'fourteen',
-            15 => 'fifteen',
-            16 => 'sixteen',
-            17 => 'seventeen',
-            18 => 'eighteen',
-            19 => 'nineteen',
-            20 => 'twenty',
-            30 => 'thirty',
-            40 => 'forty',
-            50 => 'fifty',
-            60 => 'sixty',
-            70 => 'seventy',
-            80 => 'eighty',
-            90 => 'ninety',
-            100 => 'hundred',
-            1000 => 'thousand',
-            1000000 => 'million',
-            1000000000 => 'billion',
-            1000000000000 => 'trillion',
-            1000000000000000 => 'quadrillion',
-            1000000000000000000 => 'quintillion'
-        ];
-        
-        // Remove decimal part by casting to int
-        $number = (int) $number;
+    public function convertNumberToWords($num) {
+        $words = array(
+            0 => 'Zero', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 
+            5 => 'Five', 6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine',
+            10 => 'Ten', 11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 
+            15 => 'Fifteen', 16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 
+            19 => 'Nineteen', 20 => 'Twenty', 30 => 'Thirty', 40 => 'Forty', 
+            50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy', 80 => 'Eighty', 
+            90 => 'Ninety'
+        );
     
-        if ($number < 0) {
-            return $negative . $this->convertNumberToWords(abs($number));
+        // Handle numbers less than 20
+        if ($num < 20) {
+            return $words[$num];
+        }
+        // Handle numbers less than 100
+        elseif ($num < 100) {
+            return $words[intval($num / 10) * 10] . ' ' . ($num % 10 ? $words[$num % 10] : '');
+        }
+        // Handle numbers less than 1000
+        elseif ($num < 1000) {
+            return $words[intval($num / 100)] . ' Hundred' . ($num % 100 ? ' and ' . $this->convertNumberToWords($num % 100) : '');
+        }
+        // Handle numbers less than 10000 (Thousand)
+        elseif ($num < 100000) {
+            return $this->convertNumberToWords(intval($num / 1000)) . ' Thousand' . ($num % 1000 ? ' ' . $this->convertNumberToWords($num % 1000) : '');
+        }
+        // Handle numbers less than 1000000 (Lakh)
+        elseif ($num < 10000000) {
+            return $this->convertNumberToWords(intval($num / 100000)) . ' Lakh' . ($num % 100000 ? ' ' . $this->convertNumberToWords($num % 100000) : '');
+        }
+        // Handle numbers less than 100000000 (Crore)
+        elseif ($num < 100000000) {
+            return $this->convertNumberToWords(intval($num / 10000000)) . ' Crore' . ($num % 10000000 ? ' ' . $this->convertNumberToWords($num % 10000000) : '');
+        }
+        // Handle numbers exactly 100 Crore
+        elseif ($num == 100000000) {
+            return 'One Hundred Crore';
         }
     
-        $string = null;
-    
-        switch (true) {
-            case $number < 21:
-                $string = $dictionary[$number];
-                break;
-            case $number < 100:
-                $tens = ((int) ($number / 10)) * 10;
-                $units = $number % 10;
-                $string = $dictionary[$tens];
-                if ($units) {
-                    $string .= $hyphen . $dictionary[$units];
-                }
-                break;
-            case $number < 1000:
-                $hundreds = (int) ($number / 100);
-                $remainder = $number % 100;
-                $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
-                if ($remainder) {
-                    $string .= $conjunction . $this->convertNumberToWords($remainder);
-                }
-                break;
-            default:
-                $baseUnit = pow(1000, floor(log($number, 1000)));
-                $numBaseUnits = (int) ($number / $baseUnit);
-                $remainder = $number % $baseUnit;
-                $string = $this->convertNumberToWords($numBaseUnits) . ' ' . $dictionary[$baseUnit];
-                if ($remainder) {
-                    $string .= $remainder < 100 ? $conjunction : $separator;
-                    $string .= $this->convertNumberToWords($remainder);
-                }
-                break;
-        }
-    
-        return $string;
-    } 
+        return $num; // for larger numbers
+    }    
 }

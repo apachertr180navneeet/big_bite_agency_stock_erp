@@ -310,6 +310,9 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::get('/getPincodes/{city}', 'getPincodes')->name('getPincodes');
         Route::post('/check-stock', 'checkStock')->name('checkStock');
         Route::get('/category/{sub_company}', 'getCategory')->name('getCategory');
+        Route::get('/get-vendors/{sub_company_id}', 'getVendors')->name('getVendors');
+        Route::get('/get-categories/{sub_company_id}', 'getCategories')->name('getCategories');
+        Route::get('/get-items/{category_id}', 'getItems')->name('getItems');
     });
 });
 

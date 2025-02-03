@@ -50,7 +50,7 @@
         </li>  --}}
 
         {{--  Process menu  --}}
-        {{--  <li class="menu-item {{ request()->routeIs(['company.purches.book.*', 'company.sales.book.*', 'company.receipt.book.voucher.*', 'company.payment.book.*']) ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->routeIs(['company.purches.book.*', 'company.sales.book.*', 'company.receipt.book.voucher.*', 'company.payment.book.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div class="text-truncate" data-i18n="Master">Process</div>
@@ -59,8 +59,6 @@
                 @foreach([
                     ['route' => 'company.purches.book.index', 'text' => 'Purchase Book'],
                     ['route' => 'company.sales.book.index', 'text' => 'Sales Book'],
-                    ['route' => 'company.receipt.book.voucher.index', 'text' => 'Receipt Voucher'],
-                    ['route' => 'company.payment.book.index', 'text' => 'Payment Voucher'],
                 ] as $processmenu)
                     <li class="menu-item {{ request()->routeIs($processmenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($processmenu['route']) }}" class="menu-link">
@@ -70,7 +68,7 @@
                     </li>
                 @endforeach
             </ul>
-        </li>  --}}
+        </li>
 
          {{--  Report menu  --}}
          {{--  <li class="menu-item {{ request()->routeIs(['company.purches.report.*', 'company.sales.report.*', 'company.receipt.report.*', 'company.payment.report.*', 'company.payment.report.*', 'company.stock.report.*', 'company.gst.report.*']) ? 'active open' : '' }}">

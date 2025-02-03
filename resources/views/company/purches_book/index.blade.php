@@ -26,8 +26,10 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Invoice number</th>
-                                    <th>Amount</th>
                                     <th>Vendor</th>
+                                    <th>Sub Company</th>
+                                    <th>Payment Type</th>
+                                    <th>Amount</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -66,17 +68,19 @@
                     }
                 },
                 { data: "invoice_number" },
-                { data: "grand_total" },
                 { data: "vendor_name" },
+                { data: "sub_company_name" },
+                { data: "payment_type" },
+                { data: "grand_total" },
                 {
                     data: "id",
                     render: function (data, type, row) {
                         const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deletePurchase(${data})">Delete</button>`;
-                        const editButton = `<a href="${baseUrl.replace(':id', data)}" class="btn btn-sm btn-info">Edit</a>`;
+                        //const editButton = `<a href="${baseUrl.replace(':id', data)}" class="btn btn-sm btn-info">Edit</a>`;
                         const viewButton = `<a href="${baseviewUrl.replace(':id', data)}" class="btn btn-sm btn-info">View</a>`;
                         const printButton = `<a href="${printbaseUrl.replace(':id', data)}" class="btn btn-sm btn-info">Print</a>`;
                         const pReturnButton = `<a href="${pReturnbaseUrl.replace(':id', data)}" class="btn btn-sm btn-success">P-Return</a>`;
-                        return `${deleteButton} ${editButton} ${viewButton} ${printButton} ${pReturnButton}`;
+                        return `${deleteButton} ${viewButton} ${printButton} ${pReturnButton}`;
                     },
                 },
             ],

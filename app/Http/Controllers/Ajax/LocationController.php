@@ -77,4 +77,25 @@ class LocationController extends Controller
         $categories = Variation::where('sub_compnay_id', $sub_company)->get(['id', 'name']);
         return response()->json($categories);
     }
+
+    public function getVendors($sub_company_id)
+    {
+        $vendors = User::where('sub_compnay_id', $sub_company_id)->where('role', 'vendor')->where('status', 'active')->get();
+
+        return response()->json($vendors);
+    }
+
+
+    public function getCategories($sub_company_id)
+    {
+        $categories = Variation::where('sub_compnay_id', $sub_company_id)->where('status', 'active')->get();
+
+        return response()->json($categories);
+    }
+
+    public function getItems($category_id)
+    {
+        $items = Item::with(['variation:id,name', 'tax:id,rate'])->where('variation_id', $category_id)->get(['id', 'name', 'tax_id' , 'company_id' , 'variation_id', 'hsn_hac']);
+        return response()->json($items);
+    }
 }
