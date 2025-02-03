@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-6 text-start">
                 <h5 class="py-2 mb-2">
-                    <span class="text-primary fw-light">Edit Sales Invoice</span>
+                    <span class="text-primary fw-light">View</span>
                 </h5>
             </div>
         </div>
@@ -20,26 +20,30 @@
             <div class="row">
                 <div class="col-xl-12 col-lg-12">
                     <div class="card mb-4">
-                        <h5 class="card-header">Edit Sales</h5>
+                        <h5 class="card-header">View</h5>
                         <div class="card-body">
                             <!-- Purchase details form -->
                             <div class="row">
                                 <!-- Date Field -->
                                 <div class="col-md-6 mb-3">
                                     <label for="date" class="form-label">Date</label>
-                                    <input class="form-control" type="date" id="date" name="date"
-                                        value="{{ $salesBook->date }}">
+                                    <input class="form-control" type="text" id="date" name="date" value="{{ $salesBook->date }}" readonly>
                                 </div>
                                 <!-- dispatch Field -->
                                 <div class="col-md-6 mb-3">
                                     <label for="dispatch" class="form-label">Dispatch</label>
                                     <input type="text" class="form-control" id="dispatch" name="dispatch"
-                                        value="{{ $salesBook->dispatch_number }}">
+                                        value="{{ $salesBook->dispatch_number }}" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="weight" class="form-label">Sub Company</label>
+                                    <input type="text" class="form-control" id="weight" name="weight"
+                                        value="{{ $subCompany->name }}" readonly>
                                 </div>
                                 <!-- customer Field -->
                                 <div class="col-md-6 mb-3">
                                     <label for="customer" class="form-label">Costomer</label>
-                                    <select class="form-select" id="customer" name="customer">
+                                    <select class="form-select" id="customer" name="customer" disabled>
                                         <option selected>Select</option>
                                         @foreach ($customers as $customer)
                                             <option value="{{ $customer->id }}"
@@ -47,22 +51,6 @@
                                                 {{ $customer->full_name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
-                                <!-- weight Field -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Place Of Supply</label>
-                                    <input type="text" class="form-control" id="weight" name="weight"
-                                        value="{{ $salesBook->item_weight }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Transport</label>
-                                    <input type="text" class="form-control" id="transport" name="transport"
-                                        value="{{ $salesBook->transport }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Vehicle No.</label>
-                                    <input type="text" class="form-control" id="vehicle_no" name="vehicle_no"
-                                        value="{{ $salesBook->vehicle_no }}">
                                 </div>
                             </div>
                         </div>
@@ -183,7 +171,7 @@
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="other_expense"
                                         value="{{ number_format((float) $salesBook->other_expense, 2) }}" min="0"
-                                        name="other_expense">
+                                        name="other_expense" readonly>
                                 </div>
                             </div>
                             <!-- Discount -->
@@ -194,7 +182,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="discount" name="discount"
-                                        min="0" value="{{ number_format((float) $salesBook->discount, 2) }}">
+                                        min="0" value="{{ number_format((float) $salesBook->discount, 2) }}" readonly>
                                 </div>
                             </div>
                             <!-- Round Off -->
@@ -205,7 +193,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="round_off" name="round_off"
-                                        value="{{ number_format((float) $salesBook->round_off, 2) }}" step="any">
+                                        value="{{ number_format((float) $salesBook->round_off, 2) }}" step="any" readonly>
                                 </div>
                             </div>
                             <!-- Grand Total -->
@@ -230,7 +218,7 @@
                                     <input type="text" class="form-control" id="received_amount"
                                         name="received_amount"
                                         value="{{ number_format((float) $salesBook->recived_amount, 2) }}"
-                                        min="0">
+                                        min="0" readonly>
                                     @error('received_amount')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror

@@ -68,19 +68,22 @@
                             <p class="mb-1">Address</p>
                             <p class="mb-0" style="color: #000">{{ $salesReport->customer_address }}</p>
                             <p class="mb-0" style="color: #000">{{ $salesReport->customer_city }}({{ $salesReport->customer_phone }})</p>
-                            <p class="mb-0" style="color: #000">{{ $salesReport->customer_state }} (State Code :- {{ substr($salesReport->customer_gst_no, 0, 2) }})</p>
-                            <p class="mb-0" style="color: #000">GST No.: {{ $salesReport->customer_gst_no }}</p>
+                            <p class="mb-0" style="color: #000">
+                                {{ $salesReport->customer_state }}
+                                @if ($salesReport->customer_gst_no) 
+                                    (State Code :- {{ substr($salesReport->customer_gst_no, 0, 2) }})
+                                @endif
+                            </p>
+                            @if ($salesReport->customer_gst_no)
+                                <p class="mb-0" style="color: #000">GST No.: {{ $salesReport->customer_gst_no }}</p>
+                            @endif
                         </div>
                         <div>
                             <h4 style="color: #000">Invoice #{{ $salesReport->dispatch_number }}</h4>
+                            <h5 style="color: #000">Invoice By {{ $subCompany->name }}</h5>
                             <div class="me-1">
                                 <span class="me-1" style="color: #000">Date:</span>
                                 <span class="fw-medium" style="color: #000">{{ $salesReport->date }}</span>
-                            </div>
-                            <div>
-                                <span class="fw-medium" style="color: #000">Transport :- {{ $salesReport->transport }}</span><br>
-                                <span class="fw-medium" style="color: #000"> Vechile No. :- {{ $salesReport->vehicle_no }}</span><br>
-                                <span class="fw-medium" style="color: #000">Place Of Supply :- {{ $salesReport->item_weight }}</span><br>
                             </div>
                         </div>
                     </div>
@@ -93,7 +96,6 @@
                                 <th class="fw-bolder" style="font-size: 17px;">Item</th>
                                 <th class="fw-bolder" style="font-size: 17px;">HSN</th>
                                 <th class="fw-bolder" style="font-size: 17px;">Qty</th>
-                                <th class="fw-bolder" style="font-size: 17px;">Unit</th>
                                 <th class="fw-bolder" style="font-size: 17px;">Rate</th>
                                 <th class="fw-bolder" style="font-size: 17px;">Tax</th>
                                 <th class="fw-bolder" style="font-size: 17px;">Amount</th>
@@ -106,7 +108,6 @@
                                     <td class="text-nowrap">{{ $item->item->name }}</td>
                                     <td class="text-nowrap">{{ $item->item->hsn_hac }}</td>
                                     <td class="text-nowrap">{{ $item->quantity ?? 'N/A' }}</td>
-                                    <td class="text-nowrap">{{ $item->item->variation->code ?? 'N/A' }}</td>
                                     <td class="text-nowrap">₹{{ number_format(floatval($item->rate ?? 0), 2) }}</td>
                                     <td class="text-nowrap">{{ $item->item->tax->rate }} %</td>
                                     <td class="text-nowrap">₹{{ number_format(floatval($item->amount ?? 0), 2) }}</td>
@@ -127,7 +128,7 @@
                                 </tr>
                             @endfor
                             <tr>
-                                <td colspan="6" class="">
+                                <td colspan="5" class="">
                                     <span style="color: #000">Rupees {{ $grandtotalwrod }}</span><br>
                                     @if($bank)
                                         <span style="color: #000">Bank :</span><br>

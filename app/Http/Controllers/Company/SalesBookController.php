@@ -278,6 +278,8 @@ class SalesBookController extends Controller
 
         $salesBook = SalesBook::with('salesbookitem.item.variation')->find($id);
 
+        $subCompany = SubCompany::find($salesBook->sub_compnay_id);
+
 
         // Fetch all active vendors for the user's company
         $customers = User::where('role', 'customer')
@@ -292,7 +294,7 @@ class SalesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.sales_book.view', compact('salesBook', 'customers', 'items'));
+        return view('company.sales_book.view', compact('salesBook', 'customers', 'items','subCompany'));
     }
 
     public function update(Request $request, $id)
