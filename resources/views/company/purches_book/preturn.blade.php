@@ -235,56 +235,67 @@
     <script>
         $(document).ready(function() {
             function updateOverallTotals() {
-                let totalBeforeTax = 0; // Sum of qty * rate for all items
+                let totalBeforeTax = 0;
                 let totalTax = 0;
                 let totalAmount = 0;
                 let otherExpenses = parseFloat($('#other_expense').val()) || 0;
                 let discount = parseFloat($('#discount').val()) || 0;
                 let roundOff = parseFloat($('#round_off').val()) || 0;
                 let givenAmount = parseFloat($('#given_amount').val()) || 0;
-
-                // Iterate over each row to calculate totals
+        
+                let companyState = $('#companyState').val();
+                let vendorState = $('#vendor option:selected').data('state');
+                let isIGSTApplicable = companyState !== vendorState; // Apply IGST if states are different
+        
                 $('#itemsTable tbody tr').each(function() {
                     let quantity = parseFloat($(this).find('.itemQty').val()) || 0;
                     let rate = parseFloat($(this).find('input[name="rates[]"]').val()) || 0;
                     let taxPercent = parseFloat($(this).find('input[name="taxespercent[]"]').val()) || 0;
-
+        
                     let amountBeforeTax = quantity * rate;
                     let taxAmount = (amountBeforeTax * taxPercent) / 100;
-
-                    // Update the hidden fields and displays in the row
+        
                     $(this).find('input[name="taxes[]"]').val(taxAmount.toFixed(2));
                     $(this).find('.taxAmountDisplay').text(taxAmount.toFixed(2));
-
+        
                     let totalRowAmount = amountBeforeTax + taxAmount;
                     $(this).find('input[name="totalAmounts[]"]').val(totalRowAmount.toFixed(2));
                     $(this).find('.totalAmountDisplay').text(totalRowAmount.toFixed(2));
-
+        
                     totalBeforeTax += amountBeforeTax;
                     totalTax += taxAmount;
                     totalAmount += totalRowAmount;
                 });
-
+        
+                if (isIGSTApplicable) {
+                    $('#igst').val(totalTax.toFixed(2));  
+                    $('#cgst').val('0.00'); 
+                    $('#sgst').val('0.00'); 
+                } else {
+                    let halfTax = totalTax / 2;
+                    $('#igst').val('0.00'); 
+                    $('#cgst').val(halfTax.toFixed(2)); 
+                    $('#sgst').val(halfTax.toFixed(2)); 
+                }
+        
                 let cgst = parseFloat($("#cgst").val()) || 0;
                 let sgst = parseFloat($("#sgst").val()) || 0;
-
-                let totalInvoiceValue = totalAmount + otherExpenses - discount + roundOff + cgst + sgst;
-
-                // Update the form fields
+                let igst = parseFloat($("#igst").val()) || 0;
+        
+                let totalInvoiceValue = totalAmount + otherExpenses - discount + roundOff + igst + cgst + sgst;
+        
                 $('#amount_before_tax').val(totalBeforeTax.toFixed(2));
-                $('#igst').val(totalTax.toFixed(2));
                 $('#grand_total').val(totalInvoiceValue.toFixed(2));
                 let remainingBalance = totalInvoiceValue - givenAmount;
                 $('#remaining_blance').val(remainingBalance.toFixed(2));
             }
-
-            // Event listener for keyup and change on quantity inputs and other relevant inputs
-            $(document).on('keyup change', '.itemQty, #other_expense, #discount, #round_off, #given_amount', function() {
+        
+            $(document).on('keyup change', '.itemQty, #vendor, #other_expense, #discount, #round_off, #given_amount', function() {
                 updateOverallTotals();
             });
-
-            // Trigger update calculations on page load (in case there are pre-filled values)
+        
             updateOverallTotals();
         });
+        
     </script>
 @endsection
