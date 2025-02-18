@@ -71,7 +71,7 @@
                                 <td>{{ $item->quantity ?? 'N/A' }}</td>
                                 <td>{{ $item->item->hsn_hac }}</td>
                                 <td>{{ $item->item->variation->name }}</td>
-                                <td>₹{{ $item->item->tax->rate }}</td>
+                                <td>₹{{ $item->rate }}</td>
                                 <td>₹{{ number_format(floatval($item->tax ?? 0), 2) }}</td>
                                 <td>₹{{ number_format(floatval($item->amount ?? 0), 2) }}</td>
                             </tr>
