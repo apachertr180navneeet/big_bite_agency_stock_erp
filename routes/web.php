@@ -184,7 +184,8 @@ Route::prefix('company')->name('company.')->group(function () {
             Route::get('/view/{id}', 'view')->name('view'); // View route
             Route::put('/update/{id}', 'update')->name('update'); // Update route
             Route::get('/p-return/{id}', 'preturn')->name('preturn'); // Edit route
-            Route::post('/p-return/save/{id}', 'preturn_update')->name('preturn.save');
+            Route::post('/p-return/save', 'preturn_update')->name('preturn.save');
+            Route::get('/return/add', 'preturnadd')->name('return.add');
         });
 
         // Sales Book Management Routes
@@ -314,6 +315,7 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::get('/get-categories/{sub_company_id}', 'getCategories')->name('getCategories');
         Route::get('/get-items/{category_id}', 'getItems')->name('getItems');
         Route::get('/get-customers/{sub_compnay_id}', 'getCustomers')->name('getCustomers');
+        Route::get('/get-purchase-details/{id}', 'getPurchaseDetails')->name('getPurchaseDetails');
     });
 });
 

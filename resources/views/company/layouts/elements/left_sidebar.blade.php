@@ -59,6 +59,7 @@
                 @foreach([
                     ['route' => 'company.purches.book.index', 'text' => 'Purchase Book'],
                     ['route' => 'company.sales.book.index', 'text' => 'Sales Book'],
+                    ['route' => 'company.purches.book.return.add', 'text' => 'Purches Return'],
                 ] as $processmenu)
                     <li class="menu-item {{ request()->routeIs($processmenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($processmenu['route']) }}" class="menu-link">
@@ -80,12 +81,7 @@
                 @foreach([
                     ['route' => 'company.purches.report.index', 'text' => 'Purchase Report'],
                     ['route' => 'company.sales.report.index', 'text' => 'Sales Report'],
-                    //['route' => 'company.receipt.report.index', 'text' => 'Receipt Book Report'],
-                    //['route' => 'company.payment.report.index', 'text' => 'Payment Book Report'],
-                    //['route' => 'company.contra.report.index', 'text' => 'Contra Report'],
-                    //['route' => 'company.bank.and.cash.report.bankindex', 'text' => 'Bank And Cash Report'],
                     ['route' => 'company.stock.report.index', 'text' => 'Stock Report'],
-                    //['route' => 'company.gst.report.index', 'text' => 'GST Report'],
                 ] as $reportmenu)
                     <li class="menu-item {{ request()->routeIs($reportmenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($reportmenu['route']) }}" class="menu-link">

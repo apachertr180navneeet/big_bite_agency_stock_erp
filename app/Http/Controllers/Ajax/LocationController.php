@@ -14,6 +14,8 @@ use App\Models\{
     Pincode,
     StockReport,
     SubCompany,
+    PurchesBook, 
+    PurchesBookItem
 };
 
 class LocationController extends Controller
@@ -104,5 +106,43 @@ class LocationController extends Controller
         $customers = User::where('sub_compnay_id', $sub_company_id)->where('role', 'customer')->where('status', 'active')->get();
 
         return response()->json($customers);
+    }
+
+    public function getPurchaseDetails($id)
+    {
+        $purchase = PurchesBook::find($id);
+        if (!$purchase) {
+            return response()->json(['success' => false, 'message' => 'Purchase not found.']);
+        }
+
+        // Fetch related purchase items
+        $items = PurchesBookItem::where('purches_book_id', $id)->get()->map(function ($item) {
+            return [
+                'item_id' => $item->item_id,
+                'item_name' => $item->item->name,
+                'current_quantity' => $item->quantity - $item->preturn,
+                'preturn' => $item->preturn, // Adjusted quantity
+                'variation' => $item->item->variation->name ?? '-',
+                'rate' => $item->rate,
+                'tax' => $item->tax,
+                'amount' => $item->amount
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'purchase' => [
+                'date' => $purchase->date,
+                'amount_before_tax' => $purchase->amount_before_tax,
+                'igst' => $purchase->igst,
+                'cgst' => $purchase->cgst,
+                'sgst' => $purchase->sgst,
+                'other_expense' => $purchase->other_expense,
+                'discount' => $purchase->discount,
+                'round_off' => $purchase->round_off,
+                'grand_total' => $purchase->grand_total
+            ],
+            'items' => $items
+        ]);
     }
 }

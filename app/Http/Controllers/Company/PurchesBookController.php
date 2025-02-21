@@ -381,6 +381,27 @@ class PurchesBookController extends Controller
         return redirect()->route('company.purches.book.index')->with('success', 'Purchase book updated successfully.');
     }
 
+    /**
+     * Show the form for adding a new purchase book.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function preturnadd()
+    {
+        // Retrieve the authenticated user and their company ID
+        $authenticatedUser = Auth::user();
+        $companyId = $authenticatedUser->company_id;
+
+        $purchesBooks = PurchesBook::where('purches_books.company_id', $companyId)
+            ->select('purches_books.*')
+            ->get();
+
+        // Return the view with the active vendors, items, and the generated invoice number
+        return view('company.purches_book.addpreturn', [
+            'purchesBooks' => $purchesBooks,
+        ]);
+    }
+
     public function preturn($id)
     {
         // Get the authenticated user and their company ID
@@ -411,10 +432,12 @@ class PurchesBookController extends Controller
         return view('company.purches_book.preturn', compact('purchaseBook', 'vendors', 'items','companyState'));
     }
 
-    public function preturn_update(Request $request, $id)
+    public function preturn_update(Request $request)
     {
         DB::beginTransaction();
         try {
+
+            $id = $request->puraches_book_id;
             // Loop through each item in the request and update the stock and purchase book
             foreach ($request->items as $index => $itemId) {
                 $quantity = $request->quantities[$index];

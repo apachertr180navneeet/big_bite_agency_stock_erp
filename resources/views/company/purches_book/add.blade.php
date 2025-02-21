@@ -384,7 +384,7 @@
                         <td>${hsn}</td>
                         <td>${variation}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
                         <td>${amountPerUnit.toFixed(2)}<input type="hidden" name="rates[]" value="${amountPerUnit.toFixed(2)}"></td>
-                        <td>${taxRate} %<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
+                        <td>${tax}<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
                         <td>${totalAmount.toFixed(2)}<input type="hidden" name="totalAmounts[]" value="${totalAmount.toFixed(2)}"></td>
                         <td><button type="button" class="btn btn-danger btn-sm removeItem">Remove</button></td>
                     </tr>
