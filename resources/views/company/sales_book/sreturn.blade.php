@@ -70,7 +70,14 @@
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $item->item->name }}<input type="hidden" name="items[]" value="{{ $item->item_id }}"></td>
-                                        <td><input type="text" class="form-control itemQty" name="quantities[]"  value="{{ $item->quantity - $item->sreturn }}" max="{{ $item->quantity }}" min="1"></td>
+                                        <td>
+                                            <input type="number" class="form-control itemQty" name="quantities[]"  
+                                            value="{{ max(1, $item->quantity - $item->sreturn) }}" 
+                                            max="{{ max(1, $item->quantity - $item->sreturn) }}" 
+                                            min="1"
+                                            oninput="validateQuantity(this)">
+                                            <small class="error-msg text-danger" style="display: none;"></small>
+                                        </td>
                                         <td>{{ $item->item->variation->name }}</td>
                                         <td>{{ number_format(floatval($item->rate ?? 0), 2) }}<input type="hidden" name="taxespercent[]" value="{{ $item->item->tax->rate }}"><input type="hidden" name="rates[]" value="{{ $item->rate }}"></td>
                                         <td><span class="taxAmountDisplay">{{ number_format(floatval($item->tax ?? 0), 2) }}</span><input type="hidden" name="taxes[]" value="{{ number_format(floatval($item->tax ?? 0), 2) }}"></td>
@@ -171,6 +178,37 @@
                                 <input type="text" class="form-control" id="grand_total" name="grand_total" value="{{ number_format( (float)$salesBook->grand_total, 2) }}" min="0" readonly>
                             </div>
                         </div>
+                        <!-- Given Amount -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="received_amount" class="form-label text-end">Received Amount</label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="text" class="form-control" id="received_amount"
+                                        name="received_amount"
+                                        value="{{ number_format((float) $salesBook->recived_amount, 2) }}"
+                                        min="0" readonly>
+                                    @error('received_amount')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- Remaining Balance -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="balance_amount" class="form-label text-end">Balance Amount</label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="text" class="form-control" id="balance_amount" name="balance_amount"
+                                        value="{{ number_format((float) $salesBook->balance_amount, 2) }}" min="0"
+                                        readonly>
+                                    @error('balance_amount')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                     </div>
                     <!-- Save button -->
                     <div class="card-body">
@@ -190,72 +228,92 @@
 
 @section('script')
 <script>
-    $(document).ready(function () {
-        // When the quantity is changed
-        $('#itemsTable').on('input', '.itemQty', function () {
-            var $row = $(this).closest('tr'); // Get the row of the quantity input
-
-            // Parse the quantity and rate as floats
-            var quantity = $row.find('input[name="quantities[]"]').val() || 0; // Ensure this is a number
-            var rate = $row.find('input[name="rates[]"]').val() || 0; // Ensure this is a number
-            var taxPercent = $row.find('input[name="taxespercent[]"]').val() || 0; // Get the tax percentage
-
-            // Calculate total amount before tax
-            var totalBeforeTax = quantity * rate;
-            console.log(rate,quantity,totalBeforeTax);
-
-            // Calculate tax
-            var taxAmount = (totalBeforeTax * taxPercent) / 100;
-
-            // Calculate total amount including tax
-            var totalAmount = totalBeforeTax + taxAmount;
-
-            // Update the tax and total amount fields
-            $row.find('.taxAmountDisplay').text(taxAmount.toFixed(2)); // Update the displayed tax
-            $row.find('input[name="taxes[]"]').val(taxAmount.toFixed(2)); // Update the hidden tax input
-            $row.find('.totalAmountDisplay').text(totalBeforeTax.toFixed(2)); // Update the displayed total amount
-            $row.find('input[name="totalAmounts[]"]').val(totalBeforeTax.toFixed(2)); // Update the hidden total amount input
-
-            // Optionally, update the amount before tax, total tax, and grand total at the bottom
-            updateTotals();
-        });
-
-        // Function to update the overall totals
-        function updateTotals() {
-            var totalBeforeTax = 0;
-            var totalTax = 0;
-            var grandTotal = 0;
-
-            var igst = document.getElementById("igst").value;
-            var cgst = document.getElementById("cgst").value;
-            var sgst = document.getElementById("sgst").value;
-
-            // Loop through each row to sum up the totals
-            $('#itemsTable tbody tr').each(function () {
-                var quantity = parseFloat($(this).find('.itemQty').val()) || 0;
-                var rate = parseFloat($(this).find('input[name="rates[]"]').val()) || 0;
-                var taxAmount = parseFloat($(this).find('input[name="taxes[]"]').val()) || 0;
-                var totalAmount = parseFloat($(this).find('input[name="totalAmounts[]"]').val()) || 0;
-
-                // Calculate totals
-                totalBeforeTax += quantity * rate;
+    $(document).ready(function() {
+        function updateOverallTotals() {
+            let totalBeforeTax = 0;
+            let totalTax = 0;
+            let totalAmount = 0;
+            let otherExpenses = parseFloat($('#other_expense').val()) || 0;
+            let discount = parseFloat($('#discount').val()) || 0;
+            let roundOff = parseFloat($('#round_off').val()) || 0;
+            let givenAmount = parseFloat($('#received_amount').val()) || 0;
+    
+            let companyState = $('#companyState').val();
+            let vendorState = $('#vendor option:selected').data('state');
+            let isIGSTApplicable = companyState !== vendorState; // Apply IGST if states are different
+    
+            $('#itemsTable tbody tr').each(function() {
+                let quantity = parseFloat($(this).find('.itemQty').val()) || 0;
+                let rate = parseFloat($(this).find('input[name="rates[]"]').val()) || 0;
+                let taxPercent = parseFloat($(this).find('input[name="taxespercent[]"]').val()) || 0;
+    
+                let amountBeforeTax = quantity * rate;
+                //alert(amountBeforeTax + ' tax');
+                let taxAmount = (amountBeforeTax * taxPercent) / 100;
+    
+                $(this).find('input[name="taxes[]"]').val(taxAmount.toFixed(2));
+                $(this).find('.taxAmountDisplay').text(taxAmount.toFixed(2));
+    
+                //let totalRowAmount = amountBeforeTax + taxAmount;
+                let totalRowAmount = amountBeforeTax;
+                $(this).find('input[name="totalAmounts[]"]').val(totalRowAmount.toFixed(2));
+                $(this).find('.totalAmountDisplay').text(totalRowAmount.toFixed(2));
+    
+                totalBeforeTax += amountBeforeTax;
                 totalTax += taxAmount;
-                grandTotal += totalAmount + totalTax;
+                totalAmount += totalRowAmount;
             });
-
-            if(igst != 0){
-                $('#igst').val(totalTax.toFixed(2));
-            }else{
-                var dividetax = totalTax /2;
-                $('#cgst').val(dividetax.toFixed(2));
-                $('#sgst').val(dividetax.toFixed(2));
+    
+            if (isIGSTApplicable) {
+                $('#igst').val(totalTax.toFixed(2));  
+                $('#cgst').val('0.00'); 
+                $('#sgst').val('0.00'); 
+            } else {
+                let halfTax = totalTax / 2;
+                $('#igst').val('0.00'); 
+                $('#cgst').val(halfTax.toFixed(2)); 
+                $('#sgst').val(halfTax.toFixed(2)); 
             }
-
-            // Update the summary fields
+    
+            let cgst = parseFloat($("#cgst").val()) || 0;
+            let sgst = parseFloat($("#sgst").val()) || 0;
+            let igst = parseFloat($("#igst").val()) || 0;
+    
+            let totalInvoiceValue = totalAmount + otherExpenses - discount + roundOff + igst + cgst + sgst;
+    
             $('#amount_before_tax').val(totalBeforeTax.toFixed(2));
-            //$('#igst').val(totalTax.toFixed(2)); // Assuming you're using IGST for simplicity
-            $('#grand_total').val(grandTotal.toFixed(2));
+            $('#grand_total').val(totalInvoiceValue.toFixed(2));
+            let remainingBalance = totalInvoiceValue - givenAmount;
+            $('#balance_amount').val(remainingBalance.toFixed(2));
         }
+    
+        $(document).on('keyup change', '.itemQty, #vendor, #other_expense, #discount, #round_off, #received_amount', function() {
+            updateOverallTotals();
+        });
+    
+        //updateOverallTotals();
     });
 </script>
+<script>
+    function validateQuantity(input) {
+        let max = parseInt(input.max);
+        let min = parseInt(input.min);
+        let value = input.value ? parseInt(input.value) : min;
+        let errorMsg = input.nextElementSibling; // Target the <small> tag next to input
+    
+        if (value > max) {
+            input.value = max; // Reset to max value
+            errorMsg.innerText = "Value should not be more than " + max;
+            errorMsg.style.display = "block"; // Show error message
+        } 
+        else if (value < min) {
+            input.value = min; // Reset to min value
+            errorMsg.innerText = "Value should not be less than " + min;
+            errorMsg.style.display = "block"; // Show error message
+        } 
+        else {
+            errorMsg.style.display = "none"; // Hide error message when valid
+        }
+    }
+    </script>
 @endsection

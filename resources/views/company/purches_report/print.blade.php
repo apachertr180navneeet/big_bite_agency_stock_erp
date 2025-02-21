@@ -68,7 +68,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->item->name }}</td>
-                                <td>{{ $item->quantity ?? 'N/A' }}</td>
+                                <td>{{ $item->preturn ?? 'N/A' }}</td>
                                 <td>{{ $item->item->hsn_hac }}</td>
                                 <td>{{ $item->item->variation->name }}</td>
                                 <td>₹{{ $item->rate }}</td>
@@ -80,7 +80,7 @@
                                 <td colspan="3" class="align-top px-4 py-5">
                                     <span>{{ $grandtotalwrod}}</span>
                                 </td>
-                                <td colspan="2" class="text-end px-4 py-5">
+                                <td colspan="4" class="text-end px-4 py-5">
                                     <p class="mb-2">SUBTOTAL :</p>
                                     <p class="mb-2">Other Expenses(+):</p>
                                     <p class="mb-2">Discount(-):</p>
@@ -92,7 +92,7 @@
                                     <p class="mb-0">Given Amount:</p>
                                     <p class="mb-0">Remaining Balance :</p>
                                 </td>
-                                <td colspan="2" class="px-4 py-5">
+                                <td colspan="4" class="px-4 py-5">
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->amount_before_tax ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->other_expense ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->discount ?? 0), 2) }}</p>

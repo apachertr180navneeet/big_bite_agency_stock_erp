@@ -395,7 +395,7 @@
                                             <td>${hsn}</td>
                                             <td>${variation}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
                                             <td>${amountPerUnit.toFixed(2)}<input type="hidden" name="rates[]" value="${amountPerUnit.toFixed(2)}"></td>
-                                            <td>${taxRate}%<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
+                                            <td>${tax}<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
                                             <td>${totalAmount.toFixed(2)}<input type="hidden" name="totalAmounts[]" value="${totalAmount.toFixed(2)}"></td>
                                             <td><button type="button" class="btn btn-danger btn-sm removeItem">Remove</button></td>
                                         </tr>
@@ -685,21 +685,21 @@
             });
         });
 
-        // Get Customer from sub company
+        // Get Vedor by sub company
         $(document).ready(function () {
             $('#sub_compnay_id').on('change', function () {
                 let subCompanyId = $(this).val();
                 let vendorDropdown = $('#customer');
                 let categoryDropdown = $('#category');
-                
+        
+                // Define URLs and replace the placeholder dynamically
+                let vendorUrl = "{{ route('ajax.getCustomers', ['sub_compnay_id' => '__ID__']) }}".replace('__ID__', subCompanyId);
+                let categoryUrl = @json(route('ajax.getCategories', ['sub_company_id' => '__ID__']));
+        
                 if (subCompanyId) {
-                    // Define URLs dynamically using template literals
-                    let customerUrl = '/ajax/get-customers/' + subCompanyId;
-                    let categoryUrl = '/ajax/get-categories/' + subCompanyId;
-                
                     // Fetch Vendors
                     $.ajax({
-                        url: customerUrl,
+                        url: vendorUrl,
                         type: 'GET',
                         dataType: 'json',
                         success: function (datavendor) {
@@ -709,10 +709,10 @@
                             });
                         }
                     });
-            
+        
                     // Fetch Categories
                     $.ajax({
-                        url: categoryUrl,
+                        url: categoryUrl.replace('__ID__', subCompanyId),
                         type: 'GET',
                         dataType: 'json',
                         success: function (data) {
@@ -728,8 +728,8 @@
                     categoryDropdown.empty().append('<option value="">Select</option>');
                 }
             });
-        });        
-
+        });
+        
         // Get Item by category
         $(document).ready(function () {
             $('#category').on('change', function () {

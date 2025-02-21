@@ -83,8 +83,8 @@
                                             <td>{{ $item->item->name }}<input type="hidden" name="items[]"
                                                     value="{{ $item->item_id }}"></td>
                                             <td><input type="text" class="form-control itemQty" name="quantities[]"
-                                                    value="{{ $item->quantity - $item->preturn }}"
-                                                    max="{{ $item->quantity }}" min="1"></td>
+                                                    value="{{ $item->preturn }}"
+                                                    max="{{ $item->preturn }}" min="1"></td>
                                             <td>{{ $item->item->variation->name }}</td>
                                             <td>{{ number_format($item->rate, 2, '.', '') ?? '0.00' }}<input type="hidden"
                                                     name="rates[]" value="{{ number_format($item->rate, 2, '.', '') }}">
@@ -215,6 +215,32 @@
                                         value="{{ number_format($purchaseBook->grand_total, 2, '.', '') }}" readonly>
                                 </div>
                             </div>
+                            <!-- Given Amount -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="given_amount" class="form-label text-end">Given Amount</label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="number" class="form-control" id="given_amount" name="given_amount" value="{{ number_format($purchaseBook->given_amount, 2, '.', '') }}" min="0" readonly>
+                                    @error('given_amount')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- Remaining Balance -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="remaining_blance" class="form-label text-end">Remaining Balance </label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="number" class="form-control" id="remaining_blance" name="remaining_blance" value="{{ number_format($purchaseBook->remaining_blance, 2, '.', '') }}" min="0" readonly>
+                                    @error('remaining_blance')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Save button -->
@@ -254,12 +280,14 @@
                     let taxPercent = parseFloat($(this).find('input[name="taxespercent[]"]').val()) || 0;
         
                     let amountBeforeTax = quantity * rate;
+                    //alert(amountBeforeTax + ' tax');
                     let taxAmount = (amountBeforeTax * taxPercent) / 100;
         
                     $(this).find('input[name="taxes[]"]').val(taxAmount.toFixed(2));
                     $(this).find('.taxAmountDisplay').text(taxAmount.toFixed(2));
         
-                    let totalRowAmount = amountBeforeTax + taxAmount;
+                    //let totalRowAmount = amountBeforeTax + taxAmount;
+                    let totalRowAmount = amountBeforeTax;
                     $(this).find('input[name="totalAmounts[]"]').val(totalRowAmount.toFixed(2));
                     $(this).find('.totalAmountDisplay').text(totalRowAmount.toFixed(2));
         
@@ -295,7 +323,7 @@
                 updateOverallTotals();
             });
         
-            updateOverallTotals();
+            //updateOverallTotals();
         });
         
     </script>

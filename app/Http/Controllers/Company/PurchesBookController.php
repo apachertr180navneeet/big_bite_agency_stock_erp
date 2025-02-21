@@ -150,6 +150,7 @@ class PurchesBookController extends Controller
                     'category' => $request->categorys[$index],
                     'item_id' => $itemId,
                     'quantity' => $request->quantities[$index],
+                    'preturn' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
                     'amount' => $request->totalAmounts[$index],
@@ -184,6 +185,7 @@ class PurchesBookController extends Controller
                 ->with('lastPurchesBook', $lastPurchesBook);
 
         } catch (\Exception $e) {
+            dd($e);
             // Rollback the transaction on error
             DB::rollback();
 
@@ -477,11 +479,19 @@ class PurchesBookController extends Controller
                     $stockReport->decrement('quantity', $quantity);
                 }
             }
-
             // Update the PurchesBook with the calculated grand total
             $purchesBook = PurchesBook::find($id);
             if ($purchesBook) {
+                $purchesBook->igst = $request->igst;
+                $purchesBook->cgst = $request->cgst;
+                $purchesBook->sgst = $request->sgst;
+                $purchesBook->other_expense = $request->other_expense;
+                $purchesBook->discount = $request->discount;
+                $purchesBook->round_off = $request->round_off;
                 $purchesBook->grand_total = $request->grand_total;
+                $purchesBook->amount_before_tax = $request->amount_before_tax;
+                $purchesBook->given_amount = $request->given_amount;
+                $purchesBook->remaining_blance = $request->remaining_blance;
                 $purchesBook->save();
             }
 
@@ -490,6 +500,7 @@ class PurchesBookController extends Controller
             return redirect()->route('company.purches.book.index')->with('success', 'Return Added successfully.');
 
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             return redirect()->back()->withInput()->withErrors(['error' => 'An error occurred while updating the return.']);
         }
