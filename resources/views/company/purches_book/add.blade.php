@@ -30,7 +30,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="date" class="form-label">Date</label>
                                     <input class="form-control" type="date" id="date" name="date"
-                                        value="{{ old('date') }}">
+                                        value="{{ old('date') }}" required>
                                     @error('date')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -39,7 +39,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="invoice" class="form-label">Invoice</label>
                                     <input type="text" class="form-control" id="invoice" name="invoice"
-                                        value="{{ old('invoice') }}">
+                                        value="{{ old('invoice') }}" required>
                                     @error('invoice')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror

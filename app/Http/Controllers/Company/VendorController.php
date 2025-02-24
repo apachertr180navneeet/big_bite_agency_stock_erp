@@ -113,7 +113,7 @@ class VendorController extends Controller
                 // }),
             ],
             'phone' => [
-                'required',
+                'nullable',
                 'string',
                 'max:20',
                 // Rule::unique('users')->where(function ($query) use ($request) {
@@ -203,7 +203,7 @@ class VendorController extends Controller
             'sub_compnay_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
-            'phone' => 'required|string|max:20',
+            'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'city' => 'required|string|max:100',
             'state' => 'required|string',
