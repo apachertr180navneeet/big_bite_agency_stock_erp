@@ -105,7 +105,7 @@ class CustomerController extends Controller
             'sub_compnay_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 'max:255',
                 // Rule::unique('users')->where(function ($query) use ($request) {
@@ -113,7 +113,7 @@ class CustomerController extends Controller
                 // }),
             ],
             'phone' => [
-                'required',
+                'nullable',
                 'string',
                 'max:20',
                 // Rule::unique('users')->where(function ($query) use ($request) {
@@ -200,8 +200,8 @@ class CustomerController extends Controller
         $request->validate([
             'sub_compnay_id' => 'required',
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $request->id,
-            'phone' => 'required|string|max:20|unique:users,phone,' . $request->id,
+            'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
+            'phone' => 'nullable|string|max:20|unique:users,phone,' . $request->id,
             'address' => 'nullable|string',
             'city' => 'required|string|max:100',
             'state' => 'required|string',

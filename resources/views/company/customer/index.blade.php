@@ -58,8 +58,8 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter Name" />
+                        <label for="full_name" class="form-label">Name</label>
+                        <input type="text" id="full_name" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -80,7 +80,7 @@
                     <div class="col-md-12 mb-3">
                         <label for="state" class="form-label">State</label>
                         <select class="form-select" id="state">
-                            <option selected>Select  State</option>
+                            <option value="">Select  State</option>
                             @foreach ($states as $state)
                                 <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
                             @endforeach
@@ -90,14 +90,14 @@
                     <div class="col-md-12 mb-3">
                         <label for="city" class="form-label">City</label>
                         <select class="form-select" id="city">
-                            <option selected>Select  City</option>
+                            <option value="">Select  City</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="zipcode" class="form-label">Pincode</label>
                         <select class="form-select" id="zipcode">
-                            <option selected>Select  Pincode</option>
+                            <option value="">Select  Pincode</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
@@ -259,7 +259,7 @@
 
             // Collect form data
             let data = {
-                full_name: $('#name').val(),
+                full_name: $('#full_name').val(),
                 sub_compnay_id:$('#sub_compnay_id').val(),
                 email: $('#email').val(),
                 phone: $('#phone').val(),
