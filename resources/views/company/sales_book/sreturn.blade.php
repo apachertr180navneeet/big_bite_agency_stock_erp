@@ -72,9 +72,8 @@
                                         <td>{{ $item->item->name }}<input type="hidden" name="items[]" value="{{ $item->item_id }}"></td>
                                         <td>
                                             <input type="number" class="form-control itemQty" name="quantities[]"  
-                                                value="{{ max(1, $item->quantity - $item->sreturn) }}" 
-                                                max="{{ max(1, $item->quantity - $item->sreturn) }}" 
-                                                min="1" 
+                                                value="{{ $item->sreturn }}" 
+                                                max="{{ $item->quantity - $item->sreturn }}"
                                                 oninput="validateQuantity(this)" 
                                                 onchange="validateQuantity(this)">
                                             <small class="error-msg text-danger" style="display: none;"></small>
@@ -188,7 +187,7 @@
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="received_amount"
                                         name="received_amount"
-                                        value="{{ number_format((float) $salesBook->recived_amount, 2) }}"
+                                        value="{{ $salesBook->recived_amount }}"
                                         min="0" readonly>
                                     @error('received_amount')
                                         <div class="text-danger">{{ $message }}</div>
@@ -237,7 +236,9 @@
             let otherExpenses = parseFloat($('#other_expense').val()) || 0;
             let discount = parseFloat($('#discount').val()) || 0;
             let roundOff = parseFloat($('#round_off').val()) || 0;
-            let givenAmount = parseFloat($('#received_amount').val()) || 0;
+            let givenAmount = $('#received_amount').val() || '0';
+            givenAmount = parseInt(givenAmount.replace(/,/g, ''), 10) || 0;
+
     
             let companyState = $('#companyState').val();
             let vendorState = $('#vendor option:selected').data('state');

@@ -107,9 +107,9 @@
                                     <td class="text-nowrap">{{ $index + 1 }}</td>
                                     <td class="text-nowrap">{{ $item->item->name }}</td>
                                     <td class="text-nowrap">{{ $item->item->hsn_hac }}</td>
-                                    <td class="text-nowrap">{{ $item->quantity ?? 'N/A' }}</td>
+                                    <td class="text-nowrap">{{ $item->sreturn == 0 ? ($item->quantity ?? 'N/A') : ($item->sreturn ?? 'N/A') }}</td>
                                     <td class="text-nowrap">₹{{ number_format(floatval($item->rate ?? 0), 2) }}</td>
-                                    <td class="text-nowrap">{{ $item->item->tax->rate }} %</td>
+                                    <td class="text-nowrap">{{ $item->tax }}</td>
                                     <td class="text-nowrap">₹{{ number_format(floatval($item->amount ?? 0), 2) }}</td>
                                 </tr>
                             @endforeach

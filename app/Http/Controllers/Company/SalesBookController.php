@@ -474,12 +474,12 @@ class SalesBookController extends Controller
                 );
                 // }
 
-                $stkqty = $existingPurchesBookItem->quantity - $quantity;
+                $stkqty = $existingPurchesBookItem->quantity - $sreturn;
                 // Update stock report
                 $stockReport = StockReport::where('item_id', $itemId)->first();
 
                 if ($stockReport) {
-                    $stockReport->increment('quantity', $quantity);
+                    $stockReport->increment('quantity', $stkqty);
                 }
             }
             // Update the PurchesBook with the calculated grand total
@@ -487,6 +487,11 @@ class SalesBookController extends Controller
             if ($salesBook) {
                 $salesBook->grand_total = $request->grand_total;
                 $salesBook->amount_before_tax = $request->amount_before_tax;
+                $salesBook->recived_amount = $request->received_amount;
+                $salesBook->balance_amount = $request->balance_amount;
+                $salesBook->igst = $request->igst;
+                $salesBook->cgst = $request->cgst;
+                $salesBook->sgst = $request->sgst;
                 $salesBook->save();
             }
 

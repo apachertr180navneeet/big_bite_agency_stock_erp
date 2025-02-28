@@ -56,6 +56,7 @@
                             <thead>
                                 <tr>
                                     <th>Item</th>
+                                    <th>Opening Stock</th>
                                     <th>Current Stock</th>
                                     <th>Sales</th>
                                     <th>S Return</th>
@@ -84,8 +85,15 @@
             },
             columns: [
                 { data: "name" },
+                { data: "opening_stock" },
                 {
                     data: "total_stock_quantity",
+                    render: function(data) {
+                        return data || 0; // Returns 0 if data is null or undefined
+                    }
+                },
+                {
+                    data: "total_sreturn",
                     render: function(data) {
                         return data || 0; // Returns 0 if data is null or undefined
                     }
@@ -99,24 +107,18 @@
                     }
                 },
                 {
-                    data: "total_sreturn",
-                    render: function(data) {
-                        return data || 0; // Returns 0 if data is null or undefined
-                    }
-                },
-                {
                     data: null, // Use null for custom data rendering
                     render: function(row) {
-                        const totalPurchasesQty = row.total_purches_book_qty || 0;
                         const totalPReturnQty = row.total_preturn || 0;
-                        return totalPurchasesQty - totalPReturnQty; // Calculate and return the value
+                        return totalPReturnQty; // Calculate and return the value
                     }
                 },
                 {
                     data: null,
                     render: function(row) {
+                        const totalPurchasesQty = row.total_purches_book_qty || 0;
                         const totalPReturnQty = row.total_preturn || 0;
-                        return totalPReturnQty; // Calculate and return the value
+                        return totalPurchasesQty - totalPReturnQty; // Calculate and return the value
                     }
                 },
             ]

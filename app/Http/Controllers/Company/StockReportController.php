@@ -54,6 +54,7 @@ public function getAll(Request $request)
                     ->select(
                         'items.id',
                         'items.name',
+                        'items.opening_stock',
                         DB::raw('COALESCE(purches_book_items.total_purches_book_qty, 0) as total_purches_book_qty'),
                         DB::raw('COALESCE(purches_book_items.total_preturn, 0) as total_preturn'),
                         DB::raw('COALESCE(sales_book_items.total_sales_book_qty, 0) as total_sales_book_qty'),

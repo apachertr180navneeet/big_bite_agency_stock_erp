@@ -83,16 +83,18 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $item->item->name }}<input type="hidden" name="items[]"
                                                     value="{{ $item->item_id }}"></td>
-                                            <td>{{ $item->quantity ?? 'N/A' }}<input type="hidden" name="quantities[]"
-                                                    value="{{ $item->quantity }}"></td>
-                                            <td>{{ $item->sreturn ?? 'N/A' }}<input type="hidden" name="sreturn[]"
+                                            @php
+                                                $value = $item->sreturn == 0 ? ($item->quantity ?? 'N/A') : ($item->sreturn ?? 'N/A');
+                                            @endphp
+                                            <td>{{ $value }}<input type="hidden" name="quantities[]" value="{{ $value }}"></td>                                                
+                                            <td>{{ $item->quantity - $item->sreturn ?? 'N/A' }}<input type="hidden" name="sreturn[]"
                                                     value="{{ $item->sreturn }}"></td>
                                             <td>{{ $item->item->variation->name }}</td>
                                             <td>{{ $item->item->hsn_hac }}</td>
                                             <td>{{ number_format(floatval($item->rate ?? 0), 2) }}<input type="hidden"
                                                     name="rates[]"
                                                     value="{{ number_format(floatval($item->rate ?? 0), 2) }}"></td>
-                                            <td>{{ number_format(floatval($tax_rate ?? 0), 2) }}%<input type="hidden"
+                                            <td>{{ $item->tax }}<input type="hidden"
                                                     name="taxes[]"
                                                     value="{{ number_format(floatval($item->tax ?? 0), 2) }}"></td>
                                             <td>{{ number_format(floatval($item->amount ?? 0), 2) }}<input type="hidden"
@@ -217,7 +219,7 @@
                                 <div class="col-md-4 mb-3">
                                     <input type="text" class="form-control" id="received_amount"
                                         name="received_amount"
-                                        value="{{ number_format((float) $salesBook->recived_amount, 2) }}"
+                                        value="{{ $salesBook->recived_amount }}"
                                         min="0" readonly>
                                     @error('received_amount')
                                         <div class="text-danger">{{ $message }}</div>
