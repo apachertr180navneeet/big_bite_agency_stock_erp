@@ -68,7 +68,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->item->name }}</td>
-                                <td>{{ $item->preturn ?? 'N/A' }}</td>
+                                <td>{{ $item->quantity - $item->preturn ?? 'N/A' }}</td>
                                 <td>{{ $item->item->hsn_hac }}</td>
                                 <td>{{ $item->item->variation->name }}</td>
                                 <td>₹{{ $item->rate }}</td>

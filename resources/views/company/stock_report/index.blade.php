@@ -58,8 +58,8 @@
                                     <th>Item</th>
                                     <th>Opening Stock</th>
                                     <th>Current Stock</th>
-                                    <th>Sales</th>
                                     <th>S Return</th>
+                                    <th>Sales</th>
                                     <th>Purches</th>
                                     <th>P resturn</th>
                                 </tr>
@@ -106,19 +106,19 @@
                         return totalSalesQty - totalReturnQty; // Calculate and return the value
                     }
                 },
-                {
-                    data: null, // Use null for custom data rendering
-                    render: function(row) {
-                        const totalPReturnQty = row.total_preturn || 0;
-                        return totalPReturnQty; // Calculate and return the value
-                    }
-                },
-                {
+                {   
                     data: null,
                     render: function(row) {
                         const totalPurchasesQty = row.total_purches_book_qty || 0;
                         const totalPReturnQty = row.total_preturn || 0;
                         return totalPurchasesQty - totalPReturnQty; // Calculate and return the value
+                    }
+                },
+                {
+                    data: null, // Use null for custom data rendering
+                    render: function(row) {
+                        const totalPReturnQty = row.total_preturn || 0;
+                        return totalPReturnQty; // Calculate and return the value
                     }
                 },
             ]

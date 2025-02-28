@@ -83,8 +83,8 @@
                                             <td>{{ $item->item->name }}<input type="hidden" name="items[]"
                                                     value="{{ $item->item_id }}"></td>
                                             <td><input type="text" class="form-control itemQty" name="quantities[]"
-                                                    value="{{ $item->preturn }}"
-                                                    max="{{ $item->preturn }}" min="1"></td>
+                                                    value="{{ $item->quantity - $item->preturn }}"
+                                                    max="{{ $item->quantity - $item->preturn }}" min="1"></td>
                                             <td>{{ $item->item->variation->name }}</td>
                                             <td>{{ number_format($item->rate, 2, '.', '') ?? '0.00' }}<input type="hidden"
                                                     name="rates[]" value="{{ number_format($item->rate, 2, '.', '') }}">

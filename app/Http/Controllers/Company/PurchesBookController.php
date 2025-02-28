@@ -460,10 +460,11 @@ class PurchesBookController extends Controller
 
                 // Update or create the PurchesBookItem entry if quantity has changed or record doesn't exist
                 if (!$existingPurchesBookItem || $existingPurchesBookItem->preturn != $quantity) {
+                    $preturn = $existingPurchesBookItem->preturn - $quantity;
                     PurchesBookItem::updateOrCreate(
                         ['item_id' => $itemId, 'purches_book_id' => $id],
                         [
-                            'preturn' => $quantity,
+                            'preturn' => $preturn,
                             'rate' => $amount,
                             'tax' => $tax,
                             'amount' => $total
@@ -476,7 +477,7 @@ class PurchesBookController extends Controller
                 // Update stock report
                 $stockReport = StockReport::where('item_id', $itemId)->first();
                 if ($stockReport) {
-                    $stockReport->decrement('quantity', $quantity);
+                    $stockReport->decrement('quantity', $preturn);
                 }
             }
             // Update the PurchesBook with the calculated grand total
