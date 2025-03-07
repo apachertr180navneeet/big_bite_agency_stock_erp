@@ -139,6 +139,8 @@ class PurchesBookController extends Controller
                 'given_amount' => $request->given_amount,
                 'remaining_blance' => $request->remaining_blance,
                 'payment_type' => $request->payment_type,
+                'discount_value' => $request->discount_value,
+                'cess' => $request->total_cess,
             ]);
 
             // Initialize an array to store the purchase book items
@@ -153,6 +155,7 @@ class PurchesBookController extends Controller
                     'preturn' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
+                    'cess' => $request->cess[$index],
                     'amount' => $request->totalAmounts[$index],
                 ]);
 

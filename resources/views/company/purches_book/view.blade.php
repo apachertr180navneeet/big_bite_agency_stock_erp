@@ -69,6 +69,7 @@
                                     <th>Variation</th>
                                     <th>Rate</th>
                                     <th>Tax</th>
+                                    <th>Cess</th>
                                     <th>Total Amount</th>
                                     {{--  <th>Action</th>  --}}
                                 </tr>
@@ -84,6 +85,7 @@
                                         <td>{{ $item->item->variation->name }}</td>
                                         <td>{{ number_format($item->rate, 2, '.', '') ?? '0.00' }}<input type="hidden" name="rates[]" value="{{ number_format($item->rate, 2, '.', '') }}"></td>
                                         <td>{{ number_format($item->tax, 2, '.', '') ?? '0.00' }}<input type="hidden" name="taxes[]" value="{{ number_format($item->tax, 2, '.', '') }}"></td>
+                                        <td>{{ number_format($item->cess, 2, '.', '') ?? '0.00' }}</td>
                                         <td>{{ number_format($item->amount, 2, '.', '') ?? '0.00' }}<input type="hidden" name="totalAmounts[]" value="{{ number_format($item->amount, 2, '.', '') }}"></td>
                                     </tr>
                                 @endforeach
@@ -103,6 +105,32 @@
                             <div class="col-md-4 mb-3">
                                 <input type="number" class="form-control" id="amount_before_tax" value="{{ number_format($purchaseBook->amount_before_tax, 2, '.', '') }}" name="amount_before_tax" min="0" readonly>
                                 @error('amount_before_tax')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!-- Discount -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3"></div>
+                            <div class="col-md-3 mb-3">
+                                <label for="discount" class="form-label">Discount(-)</label>
+                            </div>
+                            <div class="col-md-2 mb-3"></div>
+                            <div class="col-md-4 mb-3">
+                                <input type="number" class="form-control" id="discount" name="discount" min="0" value="{{ number_format($purchaseBook->discount, 2, '.', '') }}" readonly>
+                                <div id="discount-error" class="text-danger"></div>
+                            </div>
+                        </div>
+                        <!-- Discount Value -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3"></div>
+                            <div class="col-md-5 mb-3">
+                                <label for="discount" class="form-label text-end">Discounted Amount(-)</label>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <input type="number" class="form-control" id="discount_value" name="discount_value"
+                                    min="0" value="{{ number_format($purchaseBook->discount_value, 2, '.', '') }}" readonly>
+                                @error('discount_value')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -141,6 +169,21 @@
                                 @enderror
                             </div>
                         </div>
+                        <!-- Cess Tax -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="igst" class="form-label text-end">Cess</label>
+                                </div>
+                                <div class="col-md-2 mb-3"></div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="number" class="form-control" id="total_cess" value="{{ number_format($purchaseBook->cess, 2, '.', '') }}"
+                                        name="total_cess" min="0" readonly>
+                                    @error('igst')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         <!-- Other Expenses -->
                         <div class="row">
                             <div class="col-md-3 mb-3"></div>
@@ -151,18 +194,6 @@
                             <div class="col-md-4 mb-3">
                                 <input type="number" class="form-control" id="other_expense" value="{{ number_format($purchaseBook->other_expense, 2, '.', '') }}" min="0" name="other_expense" readonly>
                                 <div id="other_expense-error" class="text-danger"></div>
-                            </div>
-                        </div>
-                        <!-- Discount -->
-                        <div class="row">
-                            <div class="col-md-3 mb-3"></div>
-                            <div class="col-md-3 mb-3">
-                                <label for="discount" class="form-label">Discount(-)</label>
-                            </div>
-                            <div class="col-md-2 mb-3"></div>
-                            <div class="col-md-4 mb-3">
-                                <input type="number" class="form-control" id="discount" name="discount" min="0" value="{{ number_format($purchaseBook->discount, 2, '.', '') }}" readonly>
-                                <div id="discount-error" class="text-danger"></div>
                             </div>
                         </div>
                         <!-- Round Off -->
@@ -209,6 +240,19 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <input type="number" class="form-control" id="remaining_blance" name="remaining_blance" value="{{ number_format($purchaseBook->remaining_blance, 2, '.', '') }}" min="0" readonly>
+                                @error('remaining_blance')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <!-- UPI -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3"></div>
+                            <div class="col-md-5 mb-3">
+                                <label for="remaining_blance" class="form-label text-end">Payment Type </label>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <input type="text" class="form-control" id="payment_type" name="payment_type" value="{{ $purchaseBook->payment_type }}" readonly>
                                 @error('remaining_blance')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror

@@ -18,7 +18,7 @@ class PurchesBook extends Model
      * @var array
      */
     protected $fillable = [
-        'date', 'invoice_number', 'vendor_id','sub_compnay_id', 'transport', 'igst', 'sgst','cgst', 'other_expense', 'discount', 'round_off', 'grand_total' , 'status' , 'company_id','amount_before_tax','given_amount','remaining_blance','payment_type' // Add all the attributes you want to be mass assignable
+        'date', 'invoice_number', 'vendor_id','sub_compnay_id', 'transport', 'igst', 'sgst','cgst', 'other_expense', 'discount', 'round_off', 'grand_total' , 'status' , 'company_id','amount_before_tax','given_amount','remaining_blance','payment_type','discount_value','cess' // Add all the attributes you want to be mass assignable
     ];
 
     // Other model code...

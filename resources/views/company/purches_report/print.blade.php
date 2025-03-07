@@ -60,6 +60,7 @@
                                 <th>Variation</th>
                                 <th>Price</th>
                                 <th>Tax</th>
+                                <th>Cess</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
@@ -68,11 +69,12 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->item->name }}</td>
-                                <td>{{ $item->quantity - $item->preturn ?? 'N/A' }}</td>
+                                <td>{{ $item->quantity ?? 'N/A' }}</td>
                                 <td>{{ $item->item->hsn_hac }}</td>
                                 <td>{{ $item->item->variation->name }}</td>
                                 <td>₹{{ $item->rate }}</td>
                                 <td>₹{{ number_format(floatval($item->tax ?? 0), 2) }}</td>
+                                <td>₹{{ number_format(floatval($item->cess ?? 0), 2) }}</td>
                                 <td>₹{{ number_format(floatval($item->amount ?? 0), 2) }}</td>
                             </tr>
                             @endforeach
@@ -80,13 +82,15 @@
                                 <td colspan="3" class="align-top px-4 py-5">
                                     <span>{{ $grandtotalwrod}}</span>
                                 </td>
-                                <td colspan="4" class="text-end px-4 py-5">
+                                <td colspan="5" class="text-end px-4 py-5">
                                     <p class="mb-2">SUBTOTAL :</p>
-                                    <p class="mb-2">Other Expenses(+):</p>
                                     <p class="mb-2">Discount(-):</p>
+                                    <p class="mb-2">Discount Value(-):</p>
+                                    <p class="mb-2">Other Expenses(+):</p>
                                     <p class="mb-2">Tax(IGST)(+):</p>
                                     <p class="mb-2">Tax(SGST)(+):</p>
                                     <p class="mb-2">Tax(CGST)(+):</p>
+                                    <p class="mb-2">Tax(CESS)(+):</p>
                                     <p class="mb-2">Round Off(-/+):</p>
                                     <p class="mb-0">Grand Total:</p>
                                     <p class="mb-0">Given Amount:</p>
@@ -94,11 +98,13 @@
                                 </td>
                                 <td colspan="4" class="px-4 py-5">
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->amount_before_tax ?? 0), 2) }}</p>
-                                    <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->other_expense ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->discount ?? 0), 2) }}</p>
+                                    <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->discount_value ?? 0), 2) }}</p>
+                                    <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->other_expense ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->igst ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->sgst ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->cgst ?? 0), 2) }}</p>
+                                    <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->cess ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-2">₹{{ number_format(floatval($purchaseReport->round_off ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-0">₹{{ number_format(floatval($purchaseReport->grand_total ?? 0), 2) }}</p>
                                     <p class="fw-medium mb-0">₹{{ number_format(floatval($purchaseReport->given_amount ?? 0), 2) }}</p>

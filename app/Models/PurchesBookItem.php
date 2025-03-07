@@ -18,7 +18,7 @@ class PurchesBookItem extends Model
      * @var array
      */
     protected $fillable = [
-        'purches_book_id', 'category', 'item_id', 'quantity', 'rate', 'tax', 'amount', 'status','preturn' // Add all the attributes you want to be mass assignable
+        'purches_book_id', 'category', 'item_id', 'quantity', 'rate', 'tax', 'amount', 'status','preturn','cess' // Add all the attributes you want to be mass assignable
     ];
 
 
