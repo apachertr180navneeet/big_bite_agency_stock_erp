@@ -232,7 +232,7 @@
                                     <label for="other_expense" class="form-label text-end">Fate(+)</label>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="number" class="form-control" id="other_expense" value="0"
+                                    <input type="text" class="form-control" id="other_expense" value="0"
                                         min="0" name="other_expense">
                                     @error('other_expense')
                                         <div class="text-danger">{{ $message }}</div>

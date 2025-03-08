@@ -53,6 +53,7 @@ class PurchesBookController extends Controller
         $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
             ->join('sub_company', 'purches_books.sub_compnay_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
+            ->where('purches_books.purches_return', '0')
             ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
             ->orderByDesc('purches_books.id')
             ->get();
@@ -496,6 +497,7 @@ class PurchesBookController extends Controller
                 $purchesBook->amount_before_tax = $request->amount_before_tax;
                 $purchesBook->given_amount = $request->given_amount;
                 $purchesBook->remaining_blance = $request->remaining_blance;
+                $purchesBook->purches_return = '1';
                 $purchesBook->save();
             }
 
@@ -508,6 +510,32 @@ class PurchesBookController extends Controller
             DB::rollBack();
             return redirect()->back()->withInput()->withErrors(['error' => 'An error occurred while updating the return.']);
         }
+    }
+
+    public function indexreturn(Request $request)
+    {
+        // Simply returning the view for purchase book index page
+        return view('company.purches_book.preturnindex');
+    }
+
+    public function getallreturn(Request $request)
+    {
+        // Get the authenticated user and their company ID
+        $user = Auth::user();
+        $compId = $user->company_id;
+
+        // Fetch all purchase books for the user's company, including vendor details
+        $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
+            ->join('sub_company', 'purches_books.sub_compnay_id', '=', 'sub_company.id')
+            ->where('purches_books.company_id', $compId)
+            ->where('purches_books.purches_return', '1')
+            ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
+            ->orderByDesc('purches_books.id')
+            ->get();
+
+
+        // Return the purchase books data as JSON response
+        return response()->json(['data' => $purchesBooks]);
     }
 
 }

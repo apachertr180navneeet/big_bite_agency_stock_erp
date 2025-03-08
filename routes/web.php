@@ -186,6 +186,8 @@ Route::prefix('company')->name('company.')->group(function () {
             Route::get('/p-return/{id}', 'preturn')->name('preturn'); // Edit route
             Route::post('/p-return/save', 'preturn_update')->name('preturn.save');
             Route::get('/return/add', 'preturnadd')->name('return.add');
+            Route::get('/purches/return', 'indexreturn')->name('return.list');
+            Route::get('all/purches/return', 'getallreturn')->name('getall.return');
         });
 
         // Sales Book Management Routes

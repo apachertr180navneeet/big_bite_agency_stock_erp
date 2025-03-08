@@ -7,7 +7,11 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Purches Invoice</span>
+                @if ($purchaseReport->purches_return == 1) 
+                    <span class="text-primary fw-light">Purches Return Invoice</span>
+                @else
+                    <span class="text-primary fw-light">Purches Invoice</span>
+                @endif
             </h5>
         </div>
         <div class="col-md-6 text-end">
@@ -69,7 +73,11 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->item->name }}</td>
-                                <td>{{ $item->quantity ?? 'N/A' }}</td>
+                                @if ($purchaseReport->purches_return == 1) 
+                                    <td>{{ $item->quantity  - $item->preturn ?? 'N/A' }}</td>
+                                @else
+                                    <td>{{ $item->quantity ?? 'N/A' }}</td>
+                                @endif
                                 <td>{{ $item->item->hsn_hac }}</td>
                                 <td>{{ $item->item->variation->name }}</td>
                                 <td>₹{{ $item->rate }}</td>
