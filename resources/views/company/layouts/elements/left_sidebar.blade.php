@@ -58,7 +58,7 @@
             <ul class="menu-sub">
                 @foreach([
                     ['route' => 'company.purches.book.index', 'text' => 'Purchase Book'],
-                    ['route' => 'company.purches.book.return.list', 'text' => 'Purchase Return'],
+                    ['route' => 'company.purches.book.return.list', 'text' => 'Debit Note'],
                     ['route' => 'company.sales.book.index', 'text' => 'Sales Book'],
                 ] as $processmenu)
                     <li class="menu-item {{ request()->routeIs($processmenu['route']) ? 'active' : '' }}">
