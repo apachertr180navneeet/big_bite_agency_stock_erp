@@ -69,6 +69,7 @@
                                         <th>HSN</th>
                                         <th>Rate</th>
                                         <th>Tax</th>
+                                        <th>Cess</th>
                                         <th>Total Amount</th>
                                         {{--  <th>Action</th>  --}}
                                     </tr>
@@ -97,6 +98,7 @@
                                             <td>{{ $item->tax }}<input type="hidden"
                                                     name="taxes[]"
                                                     value="{{ number_format(floatval($item->tax ?? 0), 2) }}"></td>
+                                            <td>{{ number_format($item->cess, 2, '.', '') ?? '0.00' }}</td>
                                             <td>{{ number_format(floatval($item->amount ?? 0), 2) }}<input type="hidden"
                                                     name="totalAmounts[]"
                                                     value="{{ number_format(floatval($item->amount ?? 0), 2) }}"></td>
@@ -109,6 +111,7 @@
 
                         <!-- Summary fields -->
                         <div class="card-body">
+                            <!-- amount_before_tax Tax -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
                                 <div class="col-md-3 mb-3">
@@ -116,10 +119,34 @@
                                 </div>
                                 <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="amount_before_tax"
-                                        value="{{ number_format((float) $salesBook->amount_before_tax, 2) }}"
-                                        name="amount_before_tax" min="0" readonly>
+                                    <input type="number" class="form-control" id="amount_before_tax" value="{{ number_format($salesBook->amount_before_tax, 2, '.', '') }}" name="amount_before_tax" min="0" readonly>
                                     @error('amount_before_tax')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- Discount -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="discount" class="form-label">Discount(-)</label>
+                                </div>
+                                <div class="col-md-2 mb-3"></div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="number" class="form-control" id="discount" name="discount" min="0" value="{{ number_format($salesBook->discount, 2, '.', '') }}" readonly>
+                                    <div id="discount-error" class="text-danger"></div>
+                                </div>
+                            </div>
+                            <!-- Discount Value -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="discount" class="form-label text-end">Discounted Amount(-)</label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="number" class="form-control" id="discount_value" name="discount_value"
+                                        min="0" value="{{ number_format($salesBook->discount_value, 2, '.', '') }}" readonly>
+                                    @error('discount_value')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -132,9 +159,7 @@
                                 </div>
                                 <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="igst"
-                                        value="{{ number_format((float) $salesBook->igst, 2) }}" name="igst"
-                                        min="0" readonly>
+                                    <input type="number" class="form-control" id="igst" value="{{ number_format($salesBook->igst, 2, '.', '') }}" name="igst" min="0" readonly>
                                     @error('igst')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -148,80 +173,77 @@
                                 </div>
                                 <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-2 mb-3">
-                                    <input type="text" class="form-control" id="cgst"
-                                        value="{{ number_format((float) $salesBook->cgst, 2) }}" name="cgst"
-                                        min="0" readonly>
+                                    <input type="number" class="form-control" id="cgst" value="{{ number_format($salesBook->sgst, 2, '.', '') }}" name="cgst" min="0" readonly>
                                     @error('igst')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <input type="text" class="form-control" id="sgst"
-                                        value="{{ number_format((float) $salesBook->sgst, 2) }}" name="sgst"
-                                        min="0" readonly>
+                                    <input type="number" class="form-control" id="sgst" value="{{ number_format($salesBook->cgst, 2, '.', '') }}" name="sgst" min="0" readonly>
                                     @error('igst')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+                            <!-- Cess Tax -->
+                                <div class="row">
+                                    <div class="col-md-3 mb-3"></div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="igst" class="form-label text-end">Cess</label>
+                                    </div>
+                                    <div class="col-md-2 mb-3"></div>
+                                    <div class="col-md-4 mb-3">
+                                        <input type="number" class="form-control" id="total_cess" value="{{ number_format($salesBook->cess, 2, '.', '') }}"
+                                            name="total_cess" min="0" readonly>
+                                        @error('igst')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                             <!-- Other Expenses -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
-                                <div class="col-md-5 mb-3">
-                                    <label for="other_expense" class="form-label text-end">Other Expense(+)</label>
+                                <div class="col-md-3 mb-3">
+                                    <label for="other_expense" class="form-label">Other Expense(+)</label>
                                 </div>
+                                <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="other_expense"
-                                        value="{{ number_format((float) $salesBook->other_expense, 2) }}" min="0"
-                                        name="other_expense" readonly>
-                                </div>
-                            </div>
-                            <!-- Discount -->
-                            <div class="row">
-                                <div class="col-md-3 mb-3"></div>
-                                <div class="col-md-5 mb-3">
-                                    <label for="discount" class="form-label text-end">Discount(-)</label>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="discount" name="discount"
-                                        min="0" value="{{ number_format((float) $salesBook->discount, 2) }}" readonly>
+                                    <input type="number" class="form-control" id="other_expense" value="{{ number_format($salesBook->other_expense, 2, '.', '') }}" min="0" name="other_expense" readonly>
+                                    <div id="other_expense-error" class="text-danger"></div>
                                 </div>
                             </div>
                             <!-- Round Off -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
-                                <div class="col-md-5 mb-3">
-                                    <label for="round_off" class="form-label text-end">Round Off(-/+)</label>
+                                <div class="col-md-3 mb-3">
+                                    <label for="round_off" class="form-label">Round Off(-/+)</label>
                                 </div>
+                                <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="round_off" name="round_off"
-                                        value="{{ number_format((float) $salesBook->round_off, 2) }}" step="any" readonly>
+                                    <input type="number" class="form-control" id="round_off" name="round_off" value="{{ number_format($salesBook->round_off, 2, '.', '') }}" step="any" readonly>
+                                    <div id="round_off-error" class="text-danger"></div>
                                 </div>
                             </div>
-                            <!-- Grand Total -->
+                            <!-- Total Invoice value -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
-                                <div class="col-md-5 mb-3">
-                                    <label for="grand_total" class="form-label text-end">Grand Total</label>
+                                <div class="col-md-3 mb-3">
+                                    <label for="grand_total" class="form-label">Total Invoice value</label>
                                 </div>
+                                <div class="col-md-2 mb-3"></div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="grand_total" name="grand_total"
-                                        value="{{ number_format((float) $salesBook->grand_total, 2) }}" min="0"
-                                        readonly>
+                                    <input type="text" class="form-control" id="grand_total" name="grand_total" value="{{ number_format($salesBook->grand_total, 2, '.', '') }}" readonly>
                                 </div>
                             </div>
                             <!-- Given Amount -->
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
                                 <div class="col-md-5 mb-3">
-                                    <label for="received_amount" class="form-label text-end">Received Amount</label>
+                                    <label for="given_amount" class="form-label text-end">Given Amount</label>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="received_amount"
-                                        name="received_amount"
-                                        value="{{ $salesBook->recived_amount }}"
-                                        min="0" readonly>
-                                    @error('received_amount')
+                                    <input type="number" class="form-control" id="given_amount" name="given_amount" value="{{ number_format($salesBook->recived_amount, 2, '.', '') }}" min="0" readonly>
+                                    @error('given_amount')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -230,13 +252,24 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3"></div>
                                 <div class="col-md-5 mb-3">
-                                    <label for="balance_amount" class="form-label text-end">Balance Amount</label>
+                                    <label for="remaining_blance" class="form-label text-end">Remaining Balance </label>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <input type="text" class="form-control" id="balance_amount" name="balance_amount"
-                                        value="{{ number_format((float) $salesBook->balance_amount, 2) }}" min="0"
-                                        readonly>
-                                    @error('balance_amount')
+                                    <input type="number" class="form-control" id="remaining_blance" name="remaining_blance" value="{{ number_format($salesBook->balance_amount, 2, '.', '') }}" min="0" readonly>
+                                    @error('remaining_blance')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- UPI -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3"></div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="remaining_blance" class="form-label text-end">Payment Type </label>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <input type="text" class="form-control" id="payment_type" name="payment_type" value="{{ $salesBook->payment_type }}" readonly>
+                                    @error('remaining_blance')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>

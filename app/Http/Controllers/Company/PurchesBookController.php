@@ -497,7 +497,9 @@ class PurchesBookController extends Controller
                 $purchesBook->amount_before_tax = $request->amount_before_tax;
                 $purchesBook->given_amount = $request->given_amount;
                 $purchesBook->remaining_blance = $request->remaining_blance;
-                $purchesBook->purches_return = '1';
+                $purchesBook->cess = $request->total_cess;
+                $purchesBook->discount_value = $request->discount_value;
+                $purchesBook->sales_return = '1';
                 $purchesBook->save();
             }
 

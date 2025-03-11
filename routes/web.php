@@ -202,6 +202,8 @@ Route::prefix('company')->name('company.')->group(function () {
             Route::put('/update/{id}', 'update')->name('update'); // Update route
             Route::get('/s-return/{id}', 'sreturn')->name('sreturn'); // Edit route
             Route::post('/s-return/save/{id}', 'sreturn_update')->name('spreturn.save');
+            Route::get('/sales/return', 'indexreturn')->name('return.list');
+            Route::get('all/sales/return', 'getallreturn')->name('getall.return');
         });
 
         // Receipt Book Voucher Management Routes

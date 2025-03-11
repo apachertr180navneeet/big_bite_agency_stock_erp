@@ -60,6 +60,7 @@
                     ['route' => 'company.purches.book.index', 'text' => 'Purchase Book'],
                     ['route' => 'company.purches.book.return.list', 'text' => 'Debit Note'],
                     ['route' => 'company.sales.book.index', 'text' => 'Sales Book'],
+                    ['route' => 'company.sales.book.return.list', 'text' => 'Credit Note'],
                 ] as $processmenu)
                     <li class="menu-item {{ request()->routeIs($processmenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($processmenu['route']) }}" class="menu-link">

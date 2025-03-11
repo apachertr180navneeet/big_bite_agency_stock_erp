@@ -55,6 +55,7 @@ class SalesBookController extends Controller
         $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
             ->join('sub_company', 'sales_books.sub_compnay_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
+            ->where('sales_books.sales_return', '0')
             ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
             ->orderByDesc('sales_books.id')
             ->get();
@@ -163,8 +164,10 @@ class SalesBookController extends Controller
                 'discount' => $request->discount,
                 'round_off' => $request->round_off,
                 'grand_total' => $request->grand_total,
-                'recived_amount' => $request->received_amount,
-                'balance_amount' => $request->balance_amount,
+                'recived_amount' => $request->given_amount,
+                'balance_amount' => $request->remaining_blance,
+                'discount_value' => $request->discount_value,
+                'cess' => $request->total_cess,
             ]);
 
             // Save each item in the sales_book_items table
@@ -176,6 +179,7 @@ class SalesBookController extends Controller
                     'quantity' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
+                    'cess' => $request->cess[$index],
                     'amount' => $request->totalAmounts[$index],
                 ]);
 
@@ -492,6 +496,12 @@ class SalesBookController extends Controller
                 $salesBook->igst = $request->igst;
                 $salesBook->cgst = $request->cgst;
                 $salesBook->sgst = $request->sgst;
+                $salesBook->cess = $request->total_cess;
+                $salesBook->other_expense = $request->other_expense;
+                $salesBook->discount = $request->discount;
+                $salesBook->round_off = $request->round_off;
+                $salesBook->discount_value = $request->discount_value;
+                $salesBook->sales_return = '1';
                 $salesBook->save();
             }
 
@@ -502,5 +512,32 @@ class SalesBookController extends Controller
             DB::rollBack();
             return redirect()->back()->withInput()->withErrors(['error' => 'An error occurred while updating the return.']);
         }
+    }
+
+    public function indexreturn(Request $request)
+    {
+        // Simply returning the view for purchase book index page
+        return view('company.sales_book.indexreturn');
+    }
+
+    public function getallreturn(Request $request)
+    {
+        // Get the authenticated user and their company ID
+        $user = Auth::user();
+        $compId = $user->company_id;
+
+        // Fetch all purchase books for the user's company, including vendor details
+        $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
+            ->join('sub_company', 'sales_books.sub_compnay_id', '=', 'sub_company.id')
+            ->where('sales_books.company_id', $compId)
+            ->where('sales_books.sales_return', '1')
+            ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
+            ->orderByDesc('sales_books.id')
+            ->get();
+
+
+
+        // Return the purchase books data as JSON response
+        return response()->json(['data' => $salesBooks]);
     }
 }
