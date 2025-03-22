@@ -66,7 +66,27 @@
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <input type="hidden" class="form-control" id="transport" name="transport" value="0">
+                                <div class="col-md-6 mb-3">
+                                    <label for="transport" class="form-label">Transport</label>
+                                    <select class="form-select" id="transport" name="transport" required>
+                                        <option value="">Select</option>
+                                        @foreach ($transports as $transport)
+                                            <option value="{{ $transport->id }}"
+                                                {{ old('transport') == $transport->id ? 'selected' : '' }}>{{ $transport->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('transport')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="transport_number" class="form-label">Transport No.</label>
+                                    <input type="text" class="form-control" id="transport_number" name="transport_number"
+                                        value="{{ old('invoice') }}" required>
+                                    @error('transport_number')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 

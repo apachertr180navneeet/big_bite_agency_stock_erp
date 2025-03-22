@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State, SubCompany};
+use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State, SubCompany, Transport};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -101,6 +101,7 @@ class PurchesBookController extends Controller
         $currentDate = Carbon::now()->toDateString(); // Y-m-d format
 
         $states = State::all();
+        $transports = Transport::where('company_id',$companyId)->where('status','active')->get();
 
         // Return the view with the active vendors, items, and the generated invoice number
         return view('company.purches_book.add', [
@@ -108,7 +109,8 @@ class PurchesBookController extends Controller
             'currentDate' => $currentDate,
             'companyState' => $companyState,
             'states' => $states,
-            'subComapnys' => $activeSubComapny
+            'subComapnys' => $activeSubComapny,
+            'transports' => $transports
         ]);
     }
     
@@ -128,7 +130,8 @@ class PurchesBookController extends Controller
                 'sub_compnay_id' => $request->sub_compnay_id,
                 'invoice_number' => $request->invoice,
                 'vendor_id' => $request->vendor,
-                'transport' => $request->transport,
+                'transports' => $request->transport,
+                'transport_number' => $request->transport_number,
                 'igst' => $request->igst,
                 'cgst' => $request->cgst,
                 'sgst' => $request->sgst,
@@ -271,7 +274,13 @@ class PurchesBookController extends Controller
         $companyShortCode = $companyDetails->short_code;
         $companyState = $companyDetails->state;
 
-        $purchaseBook = PurchesBook::with('purchesbookitem.item.variation')->find($id);
+        $purchaseBook = PurchesBook::with(['purchesbookitem.item.variation']) // Keeping the original relation
+        ->where('purches_books.id', $id)
+        ->first();  
+        
+        $tranportname = Transport::where('id', $purchaseBook->transports)->first();
+        
+
 
         $subCompany = SubCompany::find($purchaseBook->sub_compnay_id);
 
@@ -289,7 +298,7 @@ class PurchesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState','subCompany'));
+        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState','subCompany','tranportname'));
     }
 
     public function update(Request $request, $id)

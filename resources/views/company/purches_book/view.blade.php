@@ -53,6 +53,18 @@
                                 </select>
                                 <div id="vendor-error" class="text-danger"></div>
                             </div>
+                            <!-- Transport Field -->
+                            <div class="col-md-6 mb-3">
+                                <label for="transport" class="form-label">Tranport</label>
+                                <input type="text" class="form-control" id="sub_company" name="sub_company" value="{{ $tranportname->name }}" readonly>
+                                <div id="transport-error" class="text-danger"></div>
+                            </div>
+                            <!-- Transport Field -->
+                            <div class="col-md-6 mb-3">
+                                <label for="transport" class="form-label">Tranport Number</label>
+                                <input type="text" class="form-control" id="sub_company" name="sub_company" value="{{ $purchaseBook->transport_number }}" readonly>
+                                <div id="transport-error" class="text-danger"></div>
+                            </div>
                         </div>
                     </div>
 
