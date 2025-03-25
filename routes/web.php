@@ -32,6 +32,7 @@ use App\Http\Controllers\Company\{
 };
 use App\Http\Controllers\PagarBook\{
     PagarBookAuthController,
+    EmployeeController
 };
 use App\Http\Controllers\Ajax\{
     LocationController
@@ -159,6 +160,20 @@ Route::prefix('pagar-book')->name('pagar.book.')->group(function () {
             Route::get('logout', 'logout')->name('logout');
             Route::get('profile', 'adminProfile')->name('profile');
             Route::post('profile', 'updateAdminProfile')->name('update.profile');
+        });
+
+        // Employee Management Routes
+        Route::prefix('employee')->name('employee.')->controller(EmployeeController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('all', 'getall')->name('getall');
+            Route::post('store', 'store')->name('store');
+            Route::post('status', 'status')->name('status');
+            Route::delete('delete/{id}', 'destroy')->name('destroy');
+            Route::get('get/{id}', 'get')->name('get');
+            Route::post('update', 'update')->name('update');
+            Route::get('getaddvance/{id}', 'getAdvance')->name('get.advance');
+            Route::post('advncestore', 'advncestore')->name('advncestore');
+            Route::get('getsalary/{id}', 'getSalary')->name('get.salary');
         });
 
     });
