@@ -29,7 +29,7 @@
                     ['route' => 'company.subcompany.index', 'text' => 'Sub Company'],
                     ['route' => 'company.variation.index', 'text' => 'Category'],
                     ['route' => 'company.item.index', 'text' => 'Item'],
-                    ['route' => 'company.vendor.index', 'text' => 'Vendor'],
+                    ['route' => 'company.vendor.index', 'text' => 'Creditors'],
                     ['route' => 'company.customer.index', 'text' => 'Customer'],
                     ['route' => 'company.transport.index', 'text' => 'Transport'],
                 ] as $mastermenu)

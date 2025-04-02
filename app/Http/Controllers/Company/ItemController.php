@@ -103,11 +103,10 @@ class ItemController extends Controller
         // Validation rules
         $rules = [
             'name' => 'required|string',
-            'description' => 'required',
             'variation_id' => 'required',
             'sub_comapny' => 'required',
             'tax_id' => 'required',
-            'hsn_hac' => 'required|unique:items,hsn_hac',
+            'hsn_hac' => 'required',
             'opening_stock' => 'required',
         ];
 
@@ -170,15 +169,10 @@ class ItemController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required',
             'variation_id' => 'required',
             'sub_compnay_id' => 'required',
             'id' => 'required|integer|exists:items,id', // Adjust as needed
             'hsn_hac' => 'required',
-            'hsn_hac' => [
-                'required',
-                Rule::unique('items', 'hsn_hac')->ignore($request->id), // Ensure account number is unique, ignoring the current record
-            ],
         ]);
 
         $user = Item::find($request->id);
