@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                Add Employee
+                Add Advance
             </button>
         </div>
     </div>

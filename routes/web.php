@@ -174,6 +174,7 @@ Route::prefix('pagar-book')->name('pagar.book.')->group(function () {
             Route::get('getaddvance/{id}', 'getAdvance')->name('get.advance');
             Route::post('advncestore', 'advncestore')->name('advncestore');
             Route::get('getsalary/{id}', 'getSalary')->name('get.salary');
+            Route::post('salarystore', 'salarystore')->name('salarystore');
         });
 
     });

@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="doj" class="form-label">Date Joining</label>
-                        <input type="text" id="doj" class="form-control" placeholder="Enter Date Joining" />
+                        <input type="date" id="doj" class="form-control" placeholder="Enter Date Joining" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -101,7 +101,7 @@
                     <div class="col-md-12 mb-3">
                         <input type="hidden" id="compid">
                         <label for="editdoj" class="form-label">Name</label>
-                        <input type="text" id="editdoj" class="form-control" placeholder="Enter Name" />
+                        <input type="date" id="editdoj" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">

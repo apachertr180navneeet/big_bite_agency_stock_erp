@@ -13,6 +13,7 @@
         </div>
     </div>
     <div class="row">
+        <h5>Total Advance Amount :- {{ $totalFinalAdvanceAmount }}</h5>
         <div class="col-xl-12 col-lg-12">
             <div class="card">
                 <div class="card-body">
@@ -48,20 +49,46 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Advance</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Create Salary</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
+                    <input type="hidden" name="user_id" id="user_id" value="{{ $userId }}">
+                    <input type="hidden" name="slarly_mounth" id="slarly_mounth" value="{{ $currentMonth }}">
                     <div class="col-md-12 mb-3">
-                        <input type="hidden" name="user_id" id="user_id" value="{{ $userId }}">
-                        <label for="date" class="form-label">Date</label>
-                        <input type="date" id="date" class="form-control" placeholder="Enter Date" />
+                        <label for="total_working_day" class="form-label">Total Working Days</label>
+                        <input type="text" id="total_working_day" class="form-control" value="{{ $totalWorkingDays }}" placeholder="Enter Total Working Days" readonly />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="amount" class="form-label">Amount</label>
-                        <input type="text" id="amount" class="form-control" placeholder="Enter Amount" />
+                        <label for="total_present_day" class="form-label">Total Present Days</label>
+                        <input type="text" id="total_present_day" class="form-control" value="" placeholder="Enter Total Present Days"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="addvanceAmount" class="form-label">Total Advance Amount</label>
+                        <input type="text" id="addvanceAmount" class="form-control" value="{{ $totalFinalAdvanceAmount }}" placeholder="Enter Advance Amount" readonly />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="diduction_amountfromadvance" class="form-label">Diduction Amount from Advance</label>
+                        <input type="text" id="diduction_amountfromadvance" class="form-control" value="0" placeholder="Enter Diduction Amount from Advance" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="diduction_amount" class="form-label">Diduction Amount</label>
+                        <input type="text" id="diduction_amount" class="form-control" value="" placeholder="Enter Diduction Amount" readonly />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="base_salary" class="form-label">Base Salary</label>
+                        <input type="text" id="base_salary" class="form-control" value="{{ $base_salary }}" placeholder="Enter Base Salary" readonly/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="amount" class="form-label">Salary Amount</label>
+                        <input type="text" id="amount" class="form-control" value="" placeholder="Enter Salary Amount" readonly/>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -82,6 +109,7 @@
         const table = $("#ItemTable").DataTable({
             processing: true,
         });
+
         // Handle form submission via AJAX
         $('#AddItem').click(function(e) {
             e.preventDefault();
@@ -89,7 +117,11 @@
             // Collect form data
             let data = {
                 user_id: $('#user_id').val(),
-                date: $('#date').val(),
+                slarly_mounth: $('#slarly_mounth').val(),
+                total_working_day: $('#total_working_day').val(),
+                total_present_day: $('#total_present_day').val(),
+                diduction_amount: $('#diduction_amount').val(),
+                diduction_amountfromadvance: $('#diduction_amountfromadvance').val(),
                 amount: $('#amount').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
@@ -99,91 +131,20 @@
             $('.error-text').text('');
 
             $.ajax({
-                url: '{{ route('pagar.book.employee.advncestore') }}', // Adjust the route as necessary
+                url: '{{ route('pagar.book.employee.salarystore') }}', // Adjust the route as necessary
                 type: 'POST',
                 data: data,
                 success: function(response) {
+                    console.log(response);
                     if (response.success) {
-                        setFlash("success", response.message);
-                        $('#addModal').modal('hide'); // Close the modal
-                        $('#addModal').find('input, textarea, select').val(''); // Reset form fields
-                        //table.ajax.reload(); // Reload DataTable
+                       
                         location.reload();
                     } else {
-                        // Display validation errors
-                        if (response.errors) {
-                            for (let field in response.errors) {
-                                let $field = $(`#${field}`);
-                                if ($field.length) {
-                                    $field.siblings('.error-text').text(response.errors[field][0]);
-                                }
-                            }
-                        } else {
-                            setFlash("error", response.message);
-                        }
+                        location.reload();
                     }
                 },
                 error: function(xhr) {
-                    setFlash("error", "An unexpected error occurred.");
-                }
-            });
-        });
-
-        // Define editUser function
-        function editUser(userId) {
-            const url = '{{ route("pagar.book.employee.get", ":userid") }}'.replace(":userid", userId);
-            $.ajax({
-                url: url, // Update this URL to match your route
-                method: 'GET',
-                success: function(data) {
-                    const user = data;
-                    console.log(user);
-
-                    // Populate modal fields with the retrieved data
-                    $('#compid').val(user.id);
-                    $('#editname').val(user.full_name);
-                    $('#editphone').val(user.phone);
-                    $('#editdoj').val(user.date_of_joing);
-                    $('#editbaseslary').val(user.base_salary);
-
-                    // Open the modal
-                    $('#editModal').modal('show');
-                    setFlash("success", 'Item found successfully.');
-                },
-                error: function(xhr) {
-                    setFlash("error", "Item not found. Please try again later.");
-                }
-            });
-        }
-
-        // Handle form submission
-        $('#EditComapany').on('click', function() {
-            const userId = $('#compid').val(); // Ensure userId is available in the scope
-            $.ajax({
-                url: '{{ route('pagar.book.employee.update') }}', // Update this URL to match your route
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    name: $('#editname').val(),
-                    phone: $('#editphone').val(),
-                    date_of_joing: $('#editdoj').val(),
-                    base_salary: $('#editbaseslary').val(),
-                    id: userId // Ensure userId is in scope or adjust accordingly
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Optionally, refresh the page or update the table with new data
-                        //table.ajax.reload();
-                        setFlash("success", response.message);
-                        $('#editModal').modal('hide'); // Close the modal
-                        $('#editModal').find('input, textarea, select').val(''); // Reset form fields
-                        table.ajax.reload(); // Reload DataTable
-                    } else {
-                        console.error('Error updating Item data:', response.message);
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error updating Item data:', xhr);
+                    location.reload();
                 }
             });
         });
@@ -195,9 +156,38 @@
                 title: message
             });
         }
-
-        // Expose functions to global scope
-        window.editUser = editUser;
     });
+</script>
+
+<script>
+    $(document).ready(function () {
+        function calculateSalary() {
+            let totalWorkingDays = parseFloat($("#total_working_day").val()) || 0;
+            let totalPresentDays = parseFloat($("#total_present_day").val()) || 0;
+            let baseSalary = parseFloat($("#base_salary").val()) || 0;
+            let advanceDeduction = parseFloat($("#diduction_amountfromadvance").val()) || 0;
+    
+            if (totalWorkingDays > 0 || baseSalary > 0) {
+                let perDaySalary = baseSalary / totalWorkingDays;
+                let salary = perDaySalary * totalPresentDays;
+    
+                // Calculate deduction
+                let deductionAmount = baseSalary - salary;
+                let finalDeduction = deductionAmount + advanceDeduction; // Include advance deduction
+                let finalSalary = baseSalary - finalDeduction; // Subtract advance deduction from salary
+    
+                $("#diduction_amount").val(finalDeduction.toFixed(2));
+                $("#amount").val(finalSalary.toFixed(2));
+            } else {
+                $("#diduction_amount").val("");
+                $("#amount").val("");
+            }
+        }
+    
+        // Trigger calculation on keyup for present days and advance deduction
+        $("#total_present_day, #diduction_amountfromadvance").on("keyup", function () {
+            calculateSalary();
+        });
+    });            
 </script>
 @endsection

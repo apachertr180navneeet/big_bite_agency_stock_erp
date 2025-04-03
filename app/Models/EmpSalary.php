@@ -15,6 +15,6 @@ class EmpSalary extends Model
 
 
     protected $fillable = [
-        'user_id', 'total_working_day', 'total_present_day', 'diduction_amount', 'amount', 'slarly_mounth' // Add all the attributes you want to be mass assignable
+        'user_id', 'total_working_day', 'total_present_day', 'diduction_amount', 'amount', 'slarly_mounth','diduction_amountfromadvance' // Add all the attributes you want to be mass assignable
     ];
 }

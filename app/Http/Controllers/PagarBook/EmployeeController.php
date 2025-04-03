@@ -215,10 +215,74 @@ class EmployeeController extends Controller
     {
         $userId = $id;
         $empSalarys = EmpSalary::where('user_id',$id)->orderBy('id', 'desc')->get();
-
+        $empDetail = User::where('role','employee')->where('id',$id)->orderBy('id', 'desc')->first();
+        $base_salary = $empDetail->base_salary;
         $addvanceAmount = AdvanceSalary::where('user_id',$id)->sum('amount');
+        $totaldiductionAmount = EmpSalary::where('user_id',$id)->sum('diduction_amountfromadvance');
 
+        $totalWorkingDays = date('t');
+        $currentMonth = date('F Y');  
 
-        return view('pagar_book.employee.salary',compact('empSalarys','userId','addvanceAmount'));
+        $totalFinalAdvanceAmount = $addvanceAmount - $totaldiductionAmount;
+
+        return view('pagar_book.employee.salary',compact('empSalarys','userId','addvanceAmount','totalWorkingDays','base_salary','currentMonth','totalFinalAdvanceAmount'));
+    }
+
+    public function salarystore(Request $request)
+    {
+        try {
+            // Validation rules
+            $rules = [
+                'user_id' => 'required',
+                'slarly_mounth' => 'required',
+                'total_working_day' => 'required',
+                'total_present_day' => 'required',
+                'diduction_amount' => 'required',
+                'amount' => 'required',
+            ];        
+
+            // Validate the request data
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ]);
+            }
+
+            // Get authenticated user
+            $user = Auth::user();
+            $compId = $user->company_id;
+
+            // Prepare salary data
+            $dataUser = [
+                'user_id' => $request->user_id,
+                'slarly_mounth' => $request->slarly_mounth,
+                'total_working_day' => $request->total_working_day,
+                'total_present_day' => $request->total_present_day,
+                'diduction_amount' => $request->diduction_amount,
+                'diduction_amountfromadvance' => $request->diduction_amountfromadvance ?? 0, // Handle null case
+                'amount' => $request->amount,
+            ];
+
+            // Save employee salary
+            EmpSalary::create($dataUser);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee salary saved successfully!',
+            ]);
+
+        } catch (\Exception $e) {
+            // Log error
+            dd($e   );
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again!',
+                'error' => $e->getMessage(), // Optional: Hide in production
+            ], 500);
+        }
     }
 }
