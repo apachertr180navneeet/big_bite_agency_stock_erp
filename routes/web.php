@@ -49,8 +49,8 @@ use App\Http\Controllers\Ajax\{
 */
 
 // Public Routes
-Route::get('/', [AdminAuthController::class, 'index']);  // Default landing page
-Route::get('/home', [AdminAuthController::class, 'index']);  // Redirect to the home page
+// Route::get('/', [AdminAuthController::class, 'index']);  // Default landing page
+// Route::get('/home', [AdminAuthController::class, 'index']);  // Redirect to the home page
 
 /*
 |--------------------------------------------------------------------------
