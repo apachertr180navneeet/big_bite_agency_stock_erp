@@ -1,0 +1,26 @@
+[04-Apr-2025 06:10:07 UTC] PHP Warning:  Undefined variable $app in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/bootstrap/app.php on line 29
+[04-Apr-2025 06:10:07 UTC] PHP Fatal error:  Uncaught Error: Call to a member function singleton() on null in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/bootstrap/app.php:29
+Stack trace:
+#0 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/public/index.php(47): require_once()
+#1 {main}
+  thrown in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/bootstrap/app.php on line 29
+[04-Apr-2025 06:10:25 UTC] PHP Fatal error:  Uncaught Illuminate\Contracts\Container\BindingResolutionException: Target [Illuminate\Contracts\Http\Kernel] is not instantiable. in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1126
+Stack trace:
+#0 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(921): Illuminate\Container\Container->notInstantiable('Illuminate\\Cont...')
+#1 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('Illuminate\\Cont...')
+#2 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(963): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#3 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#4 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(948): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#5 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#6 {main}
+  thrown in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1126
+[04-Apr-2025 06:10:28 UTC] PHP Fatal error:  Uncaught Illuminate\Contracts\Container\BindingResolutionException: Target [Illuminate\Contracts\Http\Kernel] is not instantiable. in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1126
+Stack trace:
+#0 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(921): Illuminate\Container\Container->notInstantiable('Illuminate\\Cont...')
+#1 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('Illuminate\\Cont...')
+#2 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(963): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#3 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#4 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(948): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#5 /home1/bigbiteagencys/stockerp.bigbiteagencys.com/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#6 {main}
+  thrown in /home1/bigbiteagencys/stockerp.bigbiteagencys.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1126
