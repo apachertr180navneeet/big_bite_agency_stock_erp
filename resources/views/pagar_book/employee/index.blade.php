@@ -24,6 +24,7 @@
                                     <th>Phone</th>
                                     <th>Date Of Joing</th>
                                     <th>Base Salary</th>
+                                    <th>QR CODE</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -64,6 +65,11 @@
                     <div class="col-md-12 mb-3">
                         <label for="base_salary" class="form-label">Base Salary</label>
                         <input type="text" id="base_salary" class="form-control" placeholder="Enter Base Salary" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="qr_scan" class="form-label">QR Scan</label>
+                        <input type="file" id="qr_scan" class="form-control" placeholder="Enter Base Salary" />
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -110,6 +116,14 @@
                         <input type="text" id="editbaseslary" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editqrscan" class="form-label">QR Scan</label>
+                        <input type="file" id="editqrscan" class="form-control" placeholder="Enter Base Salary" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <img src="" id="qrscanimage" alt="" style="width: 50%;">
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -141,6 +155,16 @@
                 },
                 {
                     data: "base_salary",
+                },
+                 {
+                data: "qr_scan", // Assuming 'image_url' is the key containing the image URL
+                    render: (data, type, row) => {
+                        if (data) {
+                            return `<img src="${data}" alt="Employee Image" style="width:50%" />`;
+                        } else {
+                            return `<span>No Image</span>`;
+                        }
+                    },
                 },
                 {
                     data: "status",
@@ -176,31 +200,33 @@
         $('#AddItem').click(function(e) {
             e.preventDefault();
 
-            // Collect form data
-            let data = {
-                name: $('#name').val(),
-                phone: $('#phone').val(),
-                doj: $('#doj').val(),
-                base_salary: $('#base_salary').val(),
-                _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
-            };
+            let formData = new FormData();
+            formData.append('name', $('#name').val());
+            formData.append('phone', $('#phone').val());
+            formData.append('doj', $('#doj').val());
+            formData.append('base_salary', $('#base_salary').val());
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
+            let file = $('#qr_scan')[0].files[0];
+            if (file) {
+                formData.append('qr_scan', file);
+            }
 
-            // Clear previous validation error messages
-            $('.error-text').text('');
+            $('.error-text').text(''); // Clear previous validation errors
 
             $.ajax({
-                url: '{{ route('pagar.book.employee.store') }}', // Adjust the route as necessary
+                url: '{{ route('pagar.book.employee.store') }}',
                 type: 'POST',
-                data: data,
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     if (response.success) {
                         setFlash("success", response.message);
-                        $('#addModal').modal('hide'); // Close the modal
-                        $('#addModal').find('input, textarea, select').val(''); // Reset form fields
-                        table.ajax.reload(); // Reload DataTable
+                        $('#addModal').modal('hide');
+                        $('#addModal').find('input, textarea, select').val('');
+                        table.ajax.reload();
                     } else {
-                        // Display validation errors
                         if (response.errors) {
                             for (let field in response.errors) {
                                 let $field = $(`#${field}`);
@@ -219,24 +245,33 @@
             });
         });
 
+
         // Define editUser function
         function editUser(userId) {
             const url = '{{ route("pagar.book.employee.get", ":userid") }}'.replace(":userid", userId);
+            
             $.ajax({
-                url: url, // Update this URL to match your route
+                url: url,
                 method: 'GET',
                 success: function(data) {
                     const user = data;
                     console.log(user);
 
-                    // Populate modal fields with the retrieved data
+                    // Populate form fields
                     $('#compid').val(user.id);
                     $('#editname').val(user.full_name);
                     $('#editphone').val(user.phone);
                     $('#editdoj').val(user.date_of_joing);
                     $('#editbaseslary').val(user.base_salary);
 
-                    // Open the modal
+                    // Set QR scan image preview
+                    if (user.qr_scan) {
+                        // Assuming the image path is stored and accessible via URL like '/uploads/qr_scans/'
+                        $('#qrscanimage').attr('src', '' + user.qr_scan).show();
+                    } else {
+                        $('#qrscanimage').attr('src', '').hide();
+                    }
+
                     $('#editModal').modal('show');
                     setFlash("success", 'Item found successfully.');
                 },
@@ -248,28 +283,39 @@
 
         // Handle form submission
         $('#EditComapany').on('click', function() {
-            const userId = $('#compid').val(); // Ensure userId is available in the scope
+            const formData = new FormData();
+            const file = $('#editqrscan')[0].files[0];
+
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+            formData.append('id', $('#compid').val());
+            formData.append('name', $('#editname').val());
+            formData.append('phone', $('#editphone').val());
+            formData.append('date_of_joing', $('#editdoj').val());
+            formData.append('base_salary', $('#editbaseslary').val());
+
+            if (file) {
+                formData.append('qr_scan', file);
+            }
+
             $.ajax({
-                url: '{{ route('pagar.book.employee.update') }}', // Update this URL to match your route
+                url: '{{ route("pagar.book.employee.update") }}',
                 method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    name: $('#editname').val(),
-                    phone: $('#editphone').val(),
-                    date_of_joing: $('#editdoj').val(),
-                    base_salary: $('#editbaseslary').val(),
-                    id: userId // Ensure userId is in scope or adjust accordingly
-                },
+                data: formData,
+                contentType: false,
+                processData: false,
                 success: function(response) {
                     if (response.success) {
-                        // Optionally, refresh the page or update the table with new data
-                        //table.ajax.reload();
                         setFlash("success", response.message);
-                        $('#editModal').modal('hide'); // Close the modal
-                        $('#editModal').find('input, textarea, select').val(''); // Reset form fields
-                        table.ajax.reload(); // Reload DataTable
+                        $('#editModal').modal('hide');
+                        $('#editModal').find('input, textarea, select').val('');
+                        table.ajax.reload();
+
+                        // If image returned, update preview
+                        if (response.user && response.user.qr_scan) {
+                            $('#qrscanimage').attr('src', '/uploads/qr_scans/' + response.user.qr_scan);
+                        }
                     } else {
-                        console.error('Error updating Item data:', response.message);
+                        console.error('Error updating Item data:', response.errors || response.message);
                     }
                 },
                 error: function(xhr) {
@@ -277,6 +323,7 @@
                 }
             });
         });
+
 
         // Update user status
         function updateUserStatus(userId, status) {

@@ -11,6 +11,7 @@ use App\Models\{
         EmpSalary
     };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
+use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
@@ -85,15 +86,15 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        // Validation rules
+        // Validation rules including image
         $rules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|unique:users,phone',
             'doj' => 'required|date',
             'base_salary' => 'required|numeric',
-        ];        
+            'qr_scan' => 'nullable',
+        ];
 
-        // Validate the request data
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
@@ -103,17 +104,32 @@ class EmployeeController extends Controller
             ]);
         }
 
-        $user = Auth::user();
+        // Handle image upload
+        $qrScanPath = null;
+        if ($request->hasFile('qr_scan')) {
+            $file = $request->file('qr_scan');
+            $filename = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/qr_scans'), $filename);
 
+            // Store full URL path in DB
+            $qrScanPath = url('uploads/qr_scans/' . $filename);
+        }
+
+        // Get company ID from current logged-in user
+        $user = Auth::user();
         $compId = $user->company_id;
-        // Save the User data
+
+        // Create new employee
         $dataUser = [
             'full_name' => $request->name,
             'phone' => $request->phone,
             'date_of_joing' => $request->doj,
             'base_salary' => $request->base_salary,
-            'role' => 'employee'
+            'role' => 'employee',
+            'company_id' => $compId,
+            'qr_scan' => $qrScanPath, // full URL path
         ];
+
         User::create($dataUser);
 
         return response()->json([
@@ -134,32 +150,43 @@ class EmployeeController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'id' => 'required|integer|exists:users,id', // Adjust as needed
+            'id' => 'required|integer|exists:users,id',
+            'phone' => 'nullable|string',
+            'date_of_joing' => 'nullable|date',
+            'base_salary' => 'nullable|numeric',
+            'qr_scan' => 'nullable'
         ]);
 
-        // Validation rules
-        $rules = [
-            'name' => 'required|string',
-            'id' => 'required|integer|exists:users,id', // Adjust as needed
-        ];
-
-        // Validate the request data
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ]);
-        }
-
         $user = User::find($request->id);
-        if ($user) {
-            $user->update($request->all());
-            return response()->json(['success' => true , 'message' => 'User Update Successfully']);
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found']);
         }
 
-        return response()->json(['success' => false, 'message' => 'User not found']);
+        // Update basic fields
+        $user->full_name = $request->name;
+        $user->phone = $request->phone;
+        $user->date_of_joing = $request->date_of_joing;
+        $user->base_salary = $request->base_salary;
+
+        // Handle image if uploaded
+        if ($request->hasFile('qr_scan')) {
+            $file = $request->file('qr_scan');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $filePath = public_path('uploads/qr_scans') . '/' . $filename;
+            $file->move(public_path('uploads/qr_scans'), $filename);
+            
+            // Save the full path in the database
+            $user->qr_scan = url('uploads/qr_scans/' . $filename);  // Save full URL
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'user' => $user
+        ]);
     }
 
 
