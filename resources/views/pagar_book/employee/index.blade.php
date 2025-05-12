@@ -179,6 +179,7 @@
                     data: "action",
                     render: (data, type, row) => {
                         const getaddvanceurl = '{{ route("pagar.book.employee.get.advance", ":userId") }}'.replace(":userId", row.id);
+                        const getlagerurl = '{{ route("pagar.book.employee.get.lager", ":userId") }}'.replace(":userId", row.id);
                         const getsalaryurl = '{{ route("pagar.book.employee.get.salary", ":userId") }}'.replace(":userId", row.id);
                         const statusButton = row.status === "inactive"
                             ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Activate</button>`
@@ -188,8 +189,9 @@
                         const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
                         const getAdvanceButton = `<a href="${getaddvanceurl}" class="btn btn-sm btn-success">Advance</a>`;
                         const getsalaryurlButton = `<a href="${getsalaryurl}" class="btn btn-sm btn-info">Salary</a>`;
+                        const getLagerButton = `<a href="${getlagerurl}" class="btn btn-sm btn-success">Lager</a>`;
 
-                        return `${statusButton} ${editButton} ${getAdvanceButton} ${getsalaryurlButton}`;
+                        return `${statusButton} ${editButton} ${getAdvanceButton} ${getsalaryurlButton} ${getLagerButton}`;
                     },
                 },
 

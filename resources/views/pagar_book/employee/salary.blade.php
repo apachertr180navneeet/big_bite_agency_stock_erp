@@ -22,6 +22,7 @@
                             <thead>
                                 <tr>
                                     <th>Month/Year</th>
+                                    <th>Pay Date</th>
                                     <th>Deduction</th>
                                     <th>Amount</th>
                                     {{--  <th>Action</th>  --}}
@@ -31,6 +32,7 @@
                                 @foreach ($empSalarys as $empSalary) 
                                     <tr>
                                         <td>{{ $empSalary->slarly_mounth }}</td>
+                                        <td>{{ $empSalary->pay_date }}</td>
                                         <td>{{ $empSalary->diduction_amount }}</td>
                                         <td>{{ $empSalary->amount }}</td>
                                         {{--  <td></td>  --}}
@@ -55,7 +57,8 @@
             <div class="modal-body">
                 <div class="row">
                     <input type="hidden" name="user_id" id="user_id" value="{{ $userId }}">
-                    <input type="hidden" name="slarly_mounth" id="slarly_mounth" value="{{ $currentMonth }}">
+                    <input type="hidden" name="slarly_mounth" id="slarly_mounth" value="{{ $salaryMonth }}">
+                    <input type="hidden" name="pay_date" id="pay_date" value="{{ $currentDate }}">
                     <div class="col-md-12 mb-3">
                         <label for="total_working_day" class="form-label">Total Working Days</label>
                         <input type="text" id="total_working_day" class="form-control" value="{{ $totalWorkingDays }}" placeholder="Enter Total Working Days" readonly />
@@ -82,6 +85,11 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
+                        <label for="insentive_point" class="form-label">Insentive Point</label>
+                        <input type="text" id="insentive_point" class="form-control" value="" placeholder="Enter Insentive Point"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
                         <label for="base_salary" class="form-label">Base Salary</label>
                         <input type="text" id="base_salary" class="form-control" value="{{ $base_salary }}" placeholder="Enter Base Salary" readonly/>
                         <small class="error-text text-danger"></small>
@@ -89,6 +97,16 @@
                     <div class="col-md-12 mb-3">
                         <label for="amount" class="form-label">Salary Amount</label>
                         <input type="text" id="amount" class="form-control" value="" placeholder="Enter Salary Amount" readonly/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="salary_to" class="form-label">Salary To</label>
+                        <select class="form-select" id="salary_to" aria-label="Default select example">
+                            <option value="">Salary To</option>
+                            <option value="Bank">Bank</option>
+                            <option value="RTGS">RTGS</option>
+                            <option value="UPI">UPI</option>
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -121,8 +139,11 @@
                 total_working_day: $('#total_working_day').val(),
                 total_present_day: $('#total_present_day').val(),
                 diduction_amount: $('#diduction_amount').val(),
+                salary_to: $('#salary_to').val(),
                 diduction_amountfromadvance: $('#diduction_amountfromadvance').val(),
                 amount: $('#amount').val(),
+                insentive_point: $('#insentive_point').val(),  
+                pay_date: $('#pay_date').val(), 
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
 
@@ -166,16 +187,17 @@
             let totalPresentDays = parseFloat($("#total_present_day").val()) || 0;
             let baseSalary = parseFloat($("#base_salary").val()) || 0;
             let advanceDeduction = parseFloat($("#diduction_amountfromadvance").val()) || 0;
-    
-            if (totalWorkingDays > 0 || baseSalary > 0) {
+            let insentivePoint = parseFloat($("#insentive_point").val()) || 0;
+
+            if (totalWorkingDays > 0 && baseSalary > 0) {
                 let perDaySalary = baseSalary / totalWorkingDays;
                 let salary = perDaySalary * totalPresentDays;
-    
+
                 // Calculate deduction
                 let deductionAmount = baseSalary - salary;
-                let finalDeduction = deductionAmount + advanceDeduction; // Include advance deduction
-                let finalSalary = baseSalary - finalDeduction; // Subtract advance deduction from salary
-    
+                let finalDeduction = deductionAmount + advanceDeduction;
+                let finalSalary = (baseSalary - finalDeduction) + insentivePoint;
+
                 $("#diduction_amount").val(finalDeduction.toFixed(2));
                 $("#amount").val(finalSalary.toFixed(2));
             } else {
@@ -183,9 +205,9 @@
                 $("#amount").val("");
             }
         }
-    
-        // Trigger calculation on keyup for present days and advance deduction
-        $("#total_present_day, #diduction_amountfromadvance").on("keyup", function () {
+
+        // Trigger calculation on keyup
+        $("#total_present_day, #diduction_amountfromadvance, #insentive_point").on("keyup", function () {
             calculateSalary();
         });
     });            

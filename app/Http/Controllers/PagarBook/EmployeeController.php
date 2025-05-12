@@ -248,11 +248,14 @@ class EmployeeController extends Controller
         $totaldiductionAmount = EmpSalary::where('user_id',$id)->sum('diduction_amountfromadvance');
 
         $totalWorkingDays = date('t');
-        $currentMonth = date('F Y');  
+        $currentMonth = date('F Y');
+        
+       $salaryMonth = date('F Y', strtotime('first day of last month')); // e.g., "April 2025"
+       $currentDate = date('d/m/Y');
 
         $totalFinalAdvanceAmount = $addvanceAmount - $totaldiductionAmount;
 
-        return view('pagar_book.employee.salary',compact('empSalarys','userId','addvanceAmount','totalWorkingDays','base_salary','currentMonth','totalFinalAdvanceAmount'));
+        return view('pagar_book.employee.salary',compact('empSalarys','userId','addvanceAmount','totalWorkingDays','base_salary','currentMonth','totalFinalAdvanceAmount','salaryMonth','currentDate'));
     }
 
     public function salarystore(Request $request)
@@ -266,6 +269,8 @@ class EmployeeController extends Controller
                 'total_present_day' => 'required',
                 'diduction_amount' => 'required',
                 'amount' => 'required',
+                'salary_to' => 'required',
+                'insentive_point' => 'required'
             ];        
 
             // Validate the request data
@@ -291,6 +296,9 @@ class EmployeeController extends Controller
                 'diduction_amount' => $request->diduction_amount,
                 'diduction_amountfromadvance' => $request->diduction_amountfromadvance ?? 0, // Handle null case
                 'amount' => $request->amount,
+                'salary_to' => $request->salary_to,
+                'insentive_point' => $request->insentive_point,
+                'pay_date' => $request->pay_date
             ];
 
             // Save employee salary
@@ -311,5 +319,36 @@ class EmployeeController extends Controller
                 'error' => $e->getMessage(), // Optional: Hide in production
             ], 500);
         }
+    }
+
+
+    public function getLager($id)
+    {
+        $userId = $id;
+
+        // All salary records
+        $empSalarys = EmpSalary::where('user_id', $userId)
+                        ->orderBy('id', 'desc')
+                        ->get();
+
+        // All advance records
+        $advances = AdvanceSalary::where('user_id', $userId)
+                        ->orderBy('id', 'desc')
+                        ->get();
+
+        // Summary calculations
+        $totalAdvance = $advances->sum('amount');
+        $totalDeduction = $empSalarys->sum('diduction_amountfromadvance');
+        $totalSalaryPaid = $empSalarys->sum('amount');
+        $remainingAdvance = $totalAdvance - $totalDeduction;
+
+        return view('pagar_book.employee.lager', compact(
+            'empSalarys',
+            'advances',
+            'totalAdvance',
+            'totalDeduction',
+            'totalSalaryPaid',
+            'remainingAdvance'
+        ));
     }
 }
