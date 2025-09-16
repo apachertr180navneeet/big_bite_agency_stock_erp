@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, PurchesBook, PurchesBookItem, SalesBook, SalesBookItem, StockReport,Item,Company};
+use App\Models\{User, PurchesBook, PurchesBookItem, SalesBook, SalesBookItem, StockReport,Item,Company, Variation};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -33,54 +33,65 @@ class StockReportController extends Controller
         $startDate = Carbon::parse($startDate);
         $endDate = Carbon::parse($endDate);
 
+          $variations = Variation::where('variations.company_id', $compId)
+            ->where('variations.status', 'active')
+            ->orderBy('variations.id', 'desc')
+            ->get();
+
         // Simply returning the view for purchase book index page
-        return view('company.stock_report.index',compact('companyDetail','startDate','endDate'));
+        return view('company.stock_report.index',compact('companyDetail','startDate','endDate','variations'));
     }
 
     /**
- * Fetch all purchase books for the authenticated user's company and return them as JSON.
- *
- * @param \Illuminate\Http\Request $request
- * @return \Illuminate\Http\JsonResponse
- */
-public function getAll(Request $request)
-{
-    // Get the authenticated user and their company ID
-    $user = Auth::user();
-    $compId = $user->company_id;
+     * Fetch all purchase books for the authenticated user's company and return them as JSON.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAll(Request $request)
+    {
+        $user = Auth::user();
+        $compId = $user->company_id;
+        $categoryId = $request->category_id; // Get category from request
 
-    // Fetch all purchase books for the user's company, including vendor details
-    $purchaseBooks = DB::table('items')
-                    ->select(
-                        'items.id',
-                        'items.name',
-                        'items.opening_stock',
-                        DB::raw('COALESCE(purches_book_items.total_purches_book_qty, 0) as total_purches_book_qty'),
-                        DB::raw('COALESCE(purches_book_items.total_preturn, 0) as total_preturn'),
-                        DB::raw('COALESCE(sales_book_items.total_sales_book_qty, 0) as total_sales_book_qty'),
-                        DB::raw('COALESCE(sales_book_items.total_sreturn, 0) as total_sreturn'),
-                        DB::raw('COALESCE(SUM(stock_reports.quantity), 0) as total_stock_quantity'),
-                        DB::raw('COALESCE(SUM(stock_reports.quantity) - COALESCE(sales_book_items.total_sreturn, 0), 0) as sale_return_stock'),
-                        DB::raw('COALESCE(SUM(stock_reports.quantity) - COALESCE(purches_book_items.total_preturn, 0), 0) as purchase_return_stock')
-                    )
-                    ->leftJoin(DB::raw('(SELECT item_id, SUM(quantity) as total_purches_book_qty, SUM(preturn) as total_preturn FROM purches_book_items GROUP BY item_id) as purches_book_items'), 'items.id', '=', 'purches_book_items.item_id')
-                    ->leftJoin(DB::raw('(SELECT item_id, SUM(quantity) as total_sales_book_qty, SUM(sreturn) as total_sreturn FROM sales_book_items GROUP BY item_id) as sales_book_items'), 'items.id', '=', 'sales_book_items.item_id')
-                    ->leftJoin('stock_reports', 'items.id', '=', 'stock_reports.item_id')
-                    ->where('items.company_id', $compId)
-                    ->whereNull('items.deleted_at')
-                    ->groupBy(
-                        'items.id', 
-                        'items.name', 
-                        'total_purches_book_qty', 
-                        'total_preturn', 
-                        'total_sales_book_qty', 
-                        'total_sreturn'
-                    )
-                    ->get();
+        $query = DB::table('items')
+            ->select(
+                'items.id',
+                'items.name',
+                'items.opening_stock',
+                DB::raw('COALESCE(purches_book_items.total_purches_book_qty, 0) as total_purches_book_qty'),
+                DB::raw('COALESCE(purches_book_items.total_preturn, 0) as total_preturn'),
+                DB::raw('COALESCE(sales_book_items.total_sales_book_qty, 0) as total_sales_book_qty'),
+                DB::raw('COALESCE(sales_book_items.total_sreturn, 0) as total_sreturn'),
+                DB::raw('COALESCE(SUM(stock_reports.quantity), 0) as total_stock_quantity'),
+                DB::raw('COALESCE(SUM(stock_reports.quantity) - COALESCE(sales_book_items.total_sreturn, 0), 0) as sale_return_stock'),
+                DB::raw('COALESCE(SUM(stock_reports.quantity) - COALESCE(purches_book_items.total_preturn, 0), 0) as purchase_return_stock')
+            )
+            ->leftJoin(DB::raw('(SELECT item_id, SUM(quantity) as total_purches_book_qty, SUM(preturn) as total_preturn FROM purches_book_items GROUP BY item_id) as purches_book_items'), 'items.id', '=', 'purches_book_items.item_id')
+            ->leftJoin(DB::raw('(SELECT item_id, SUM(quantity) as total_sales_book_qty, SUM(sreturn) as total_sreturn FROM sales_book_items GROUP BY item_id) as sales_book_items'), 'items.id', '=', 'sales_book_items.item_id')
+            ->leftJoin('stock_reports', 'items.id', '=', 'stock_reports.item_id')
+            ->where('items.company_id', $compId)
+            ->where('items.status', 'active')
+            ->whereNull('items.deleted_at');
 
-    // Return the purchase books data as JSON response
-    return response()->json(['data' => $purchaseBooks]);
-}
+        if (!empty($categoryId)) {
+            $query->where('items.variation_id', $categoryId); // Assuming 'variation_id' is the category column
+        }
+
+        $purchaseBooks = $query->groupBy(
+                'items.id', 
+                'items.name', 
+                'total_purches_book_qty', 
+                'total_preturn', 
+                'total_sales_book_qty', 
+                'total_sreturn'
+            )
+            ->get();
+
+        return response()->json(['data' => $purchaseBooks]);
+    }
+
+
 
 
 }

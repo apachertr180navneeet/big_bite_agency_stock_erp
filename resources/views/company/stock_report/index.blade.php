@@ -1,20 +1,6 @@
 @extends('company.layouts.app')
 @section('style')
-
-@endsection
-@section('content')
-<div class="container-fluid flex-grow-1 container-p-y">
-    <div class="row">
-        <div class="col-md-6 text-start">
-            <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Stock Report</span>
-            </h5>
-        </div>
-        <div class="col-md-6 text-end">
-            <button id="printdiv" class="btn btn-primary mt-4"> Print Data</button>
-        </div>
-    </div>
-    <style>
+<style>
         /* Print CSS */
         @media print {
             @page {
@@ -41,7 +27,15 @@
             }
         }
     </style>
-    <div class="row" id="printThis">
+@endsection
+@section('content')
+<div class="container-fluid flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-12 text-end">
+                <button id="printdiv" class="btn btn-primary mt-4"> Print Data</button>
+            </div>
+        </div>
         <div class="col-xl-12 col-lg-12">
             <div class="card">
                 <div class="card-body">
@@ -51,7 +45,13 @@
                         <h5 id="gstNumber"></h5>
                         <p id="dateRange"></p>
                     </div>
-                    <div class="table-responsive">
+                    <select id="categorySelect" class="form-select" aria-label="Default select example">
+                        <option value="">Select Category</option>
+                        @foreach($variations as $variation)
+                            <option value="{{ $variation->id }}">{{ $variation->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="table-responsive"  id="printThis">
                         <table class="table table-bordered" id="variationTable" style="width: 99%">
                             <thead>
                                 <tr>
@@ -79,9 +79,13 @@
     $(document).ready(function() {
         const table = $('#variationTable').DataTable({
             processing: true,
+            paging: false,
             ajax: {
                 url: "{{ route('company.stock.report.getall') }}",
                 type: 'GET',
+                data: function(d) {
+                    d.category_id = $('#categorySelect').val(); // Send selected category ID
+                }
             },
             columns: [
                 { data: "name" },
@@ -89,41 +93,46 @@
                 {
                     data: "total_stock_quantity",
                     render: function(data) {
-                        return data || 0; // Returns 0 if data is null or undefined
+                        return data || 0;
                     }
                 },
                 {
                     data: "total_sreturn",
                     render: function(data) {
-                        return data || 0; // Returns 0 if data is null or undefined
+                        return data || 0;
                     }
                 },
                 {
-                    data: null, // Use null for custom data rendering
+                    data: null,
                     render: function(row) {
                         const totalSalesQty = row.total_sales_book_qty || 0;
                         const totalReturnQty = row.total_sreturn || 0;
-                        return totalSalesQty - totalReturnQty; // Calculate and return the value
+                        return totalSalesQty - totalReturnQty;
                     }
                 },
-                {   
+                {
                     data: null,
                     render: function(row) {
                         const totalPurchasesQty = row.total_purches_book_qty || 0;
                         const totalPReturnQty = row.total_preturn || 0;
-                        return totalPurchasesQty - totalPReturnQty; // Calculate and return the value
+                        return totalPurchasesQty - totalPReturnQty;
                     }
                 },
                 {
-                    data: null, // Use null for custom data rendering
+                    data: null,
                     render: function(row) {
-                        const totalPReturnQty = row.total_preturn || 0;
-                        return totalPReturnQty; // Calculate and return the value
+                        return row.total_preturn || 0;
                     }
                 },
             ]
         });
+
+        // Trigger reload on category change
+        $('#categorySelect').on('change', function() {
+            table.ajax.reload();
+        });
     });
+
 
 </script>
 <script>
