@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\{
     User,
     Company,
-    Item,
-    Variation
+    Item
 };
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -280,11 +279,10 @@ class CompanyAuthController extends Controller
     {
         $user = Auth::user();
         $compId = $user->company_id;
-        $categoryCount = Variation::where('status','active')->where('company_id', $compId)->count();
         $itemCount = Item::where('status','active')->where('company_id', $compId)->count();
         $vendorCount = User::where('status','active')->where('role','vendor')->where('company_id', $compId)->count();
         $customerCount = User::where('status','active')->where('role','customer')->where('company_id', $compId)->count();
-        return view("company.dashboard.index",compact('categoryCount','itemCount','vendorCount','customerCount'));
+        return view("company.dashboard.index",compact('itemCount','vendorCount','customerCount'));
     }
 
 
