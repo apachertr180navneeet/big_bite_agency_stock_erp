@@ -56,16 +56,7 @@
                         <textarea class="form-control" id="description" rows="3"></textarea>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="sub_comapny" class="form-label">Sub Company</label>
-                        <select id="sub_comapny" class="form-select form-select">
-                            <option value="">select</option>
-                            @foreach ( $subcompanys as $subcompany )
-                                <option value="{{ $subcompany->id }}" data-id="{{$subcompany->id}}">{{ $subcompany->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                     <div class="col-md-12 mb-3">
                         <label for="variation_id" class="form-label">Category</label>
                         <select id="variation_id" class="form-select form-select">
@@ -124,16 +115,7 @@
                         <textarea class="form-control" id="editdescription" rows="3"></textarea>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_sub_comapny" class="form-label">Sub Company</label>
-                        <select id="edit_sub_comapny" class="form-select form-select">
-                            <option value="">select</option>
-                            @foreach ( $subcompanys as $subcompany )
-                                <option value="{{ $subcompany->id }}" data-id="{{$subcompany->id}}">{{ $subcompany->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                     <div class="col-md-12 mb-3">
                         <label for="edit_variation_id" class="form-label">Category</label>
                         <select id="edit_variation_id" class="form-select form-select">
@@ -188,7 +170,7 @@
                     data: "variation_name",
                 },
                 {
-                    data: "sub_company_name",
+                    
                 },
                 {
                     data: "hsn_hac",
@@ -283,7 +265,7 @@
                     $('#compid').val(user.id);
                     $('#editname').val(user.name);
                     $('#editdescription').val(user.description);
-                    $('#edit_sub_comapny').val(user.sub_company_id);
+                    
                     $('#edit_variation_id').val(user.variation_id);
                     $('#edithsn_hac').val(user.hsn_hac);
                     $('#edittax_id').val(user.tax_id);
@@ -319,7 +301,7 @@
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(),
                     description: $('#editdescription').val(),
-                    sub_company_id: $('#edit_sub_comapny').val(),
+                    
                     variation_id: $('#edit_variation_id').val(),
                     hsn_hac: $('#edithsn_hac').val(),
                     tax_id: $('#edittax_id').val(),
@@ -439,14 +421,14 @@
         // Trigger when state is changed in the 'Edit Vendor' modal
         $('#edit_sub_comapny').on('change', function () {
             let subcompanyId = $('#edit_sub_comapny').find(':selected').attr('data-id');
-            fetchCategory(subcompanyId, $('#edit_variation_id')); // Fetch cities based on selected state
+            fetchCategory($('#edit_variation_id')); // Fetch cities based on selected state
         });
 
         // Function to fetch Category based on Sub Company ID
         function fetchCategory(categoryId, categoryElement) {
             if (categoryId) {
                 $.ajax({
-                    url: '{{ route("ajax.getCategory", "") }}/' + categoryId, // Fetch category based on Sub Company ID
+                    url: '{{ route("ajax.getCategory") }}', // Fetch category based on Sub Company ID
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {

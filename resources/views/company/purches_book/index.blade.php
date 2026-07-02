@@ -27,7 +27,7 @@
                                     <th>Date</th>
                                     <th>Invoice number</th>
                                     <th>Vendor</th>
-                                    <th>Sub Company</th>
+                                    
                                     <th>Payment Type</th>
                                     <th>Amount</th>
                                     <th>Action</th>
@@ -69,7 +69,7 @@
                 },
                 { data: "invoice_number" },
                 { data: "vendor_name" },
-                { data: "sub_company_name" },
+                
                 { data: "payment_type" },
                 { data: "grand_total" },
                 {

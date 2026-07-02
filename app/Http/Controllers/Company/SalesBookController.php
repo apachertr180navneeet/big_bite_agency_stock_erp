@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, Company, Tax, Item, SalesBook, SalesBookItem, StockReport, State, SubCompany};
+use App\Models\{User, Company, Tax, Item, SalesBook, SalesBookItem, StockReport, State};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -50,10 +50,9 @@ class SalesBookController extends Controller
 
         // Fetch all sales books for the user's company, including vendor details
         $salesBooks = SalesBook::leftJoin('users', 'sales_books.customer_id', '=', 'users.id')
-            ->leftJoin('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '0')
-            ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
+            ->select('sales_books.*', 'users.full_name as customer_name')
             ->orderByDesc('sales_books.id')
             ->get();
 
@@ -93,11 +92,7 @@ class SalesBookController extends Controller
         // Get the current date
         $currentDate = Carbon::now()->format('d/m/Y'); // DD/MM/YYYY format
 
-        // Get the active sub companies
-        $activeSubComapny = SubCompany::where([
-            ['company_id', $compId],
-            ['status', 'active']
-        ])->get();
+
 
 
         $states = State::all();
@@ -107,8 +102,7 @@ class SalesBookController extends Controller
             'invoiceNumber' => $finalInvoiceNumber,
             'currentDate' => $currentDate,
             'companyState' => $companyState,
-            'states' => $states,
-            'subComapnys' => $activeSubComapny
+            'states' => $states
         ]);
     }
 
@@ -141,7 +135,6 @@ class SalesBookController extends Controller
                 'company_id' => $compId,
                 'dispatch_number' => $request->dispatch,
                 'customer_id' => $request->customer,
-                'sub_company_id' => $request->sub_company_id,
                 'payment_type' => $request->payment_type,
                 'item_weight' => $request->weight,
                 'transport' => $request->transport,
@@ -165,7 +158,6 @@ class SalesBookController extends Controller
                 SalesBookItem::create([
                     'sales_book_id' => $salesBook->id,
                     'item_id' => $itemId,
-                    'category' => $request->categorys[$index],
                     'quantity' => $request->quantities[$index],
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
@@ -263,12 +255,9 @@ class SalesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        $subComapnys = SubCompany::where([
-            ['company_id', $compId],
-            ['status', 'active']
-        ])->get();
 
-        return view('company.sales_book.edit', compact('salesBook', 'customers', 'items', 'companyState', 'subComapnys'));
+
+        return view('company.sales_book.edit', compact('salesBook', 'customers', 'items', 'companyState'));
     }
     public function view($id)
     {
@@ -278,7 +267,7 @@ class SalesBookController extends Controller
 
         $salesBook = SalesBook::with('salesbookitem.item.variation')->find($id);
 
-        $subCompany = SubCompany::find($salesBook->sub_company_id);
+
 
 
         // Fetch all active vendors for the user's company
@@ -294,7 +283,7 @@ class SalesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.sales_book.view', compact('salesBook', 'customers', 'items','subCompany'));
+        return view('company.sales_book.view', compact('salesBook', 'customers', 'items'));
     }
 
     public function update(Request $request, $id)
@@ -338,7 +327,7 @@ class SalesBookController extends Controller
         $salesBook->date = $request->date;
         $salesBook->dispatch_number = $request->dispatch;
         $salesBook->customer_id = $request->customer;
-        $salesBook->sub_company_id = $request->sub_company_id;
+
         $salesBook->item_weight = $request->weight;
         $salesBook->transport = $request->transport;
         $salesBook->vehicle_no = $request->vehicle_no;
@@ -523,10 +512,9 @@ class SalesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $salesBooks = SalesBook::leftJoin('users', 'sales_books.customer_id', '=', 'users.id')
-            ->leftJoin('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '1')
-            ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
+            ->select('sales_books.*', 'users.full_name as customer_name')
             ->orderByDesc('sales_books.id')
             ->get();
 

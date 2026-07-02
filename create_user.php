@@ -1,1 +1,0 @@
-<?php use App\Models\User; use Illuminate\Support\Facades\Hash; $user = new User(); $user->full_name = 'Pagar Book Admin'; $user->email = 'pagarbook@example.com'; $user->phone = '1234567890'; $user->password = Hash::make('password'); $user->role = 'pagar_book'; $user->save();

@@ -21,7 +21,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Sub Company</th>
+                                    
                                     <th>Address</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -45,16 +45,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label for="sub_company_id" class="form-label">Sub Company</label>
-                        <select class="form-select" id="sub_company_id">
-                            <option value="">Select  Sub Company</option>
-                            @foreach ($subcompany as $subcomp)
-                                <option value="{{$subcomp->id}}">{{$subcomp->name}}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                     <div class="col-md-12 mb-3">
                         <label for="full_name" class="form-label">Name</label>
                         <input type="text" id="full_name" class="form-control" placeholder="Enter Name" />
@@ -102,16 +93,7 @@
 
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_sub_company" class="form-label">Sub Company</label>
-                        <select class="form-select" id="edit_sub_company">
-                            <option selected>Select  Sub Company</option>
-                            @foreach ($subcompany as $subcomp)
-                                <option value="{{$subcomp->id}}">{{$subcomp->name}}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                     <div class="col-md-12 mb-3">
                         <input type="hidden" id="compid">
                         <label for="name" class="form-label">Name</label>
@@ -161,7 +143,7 @@
         },
         columns: [
             { data: "full_name" }, // Column for vendor's full name
-            { data: "sub_company_name" }, // Column for vendor's GST number
+             // Column for vendor's GST number
             { data: "address" }, // Column for vendor's address
             {
                 data: "status", // Column for status (Active/Inactive)
@@ -197,7 +179,7 @@
         // Collect form data
         let data = {
             full_name: $('#full_name').val(),
-            sub_company_id:$('#sub_company_id').val(),
+            
             email: $('#email').val(),
             phone: $('#phone').val(),
 
@@ -260,7 +242,7 @@
                 $('#editemail').val(user.email);
                 $('#editphone').val(user.phone);
 
-                $('#edit_sub_company').val(user.sub_company_id);
+                
                 $('#editgst').val(user.gst_no);
 
                 $('#editaddress').val(user.address);
@@ -287,7 +269,7 @@
                 full_name: $('#editname').val(),
                 email: $('#editemail').val(),
                 phone: $('#editphone').val(),
-                sub_company_id:$('#edit_sub_company').val(),
+                
 
                 gst_no: $('#editgst').val(),
 

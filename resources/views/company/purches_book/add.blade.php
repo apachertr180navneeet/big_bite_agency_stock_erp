@@ -44,17 +44,7 @@
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="sub_company_id" class="form-label">Sub Company</label>
-                                    <select class="form-select" id="sub_company_id" name="sub_company_id" required>
-                                        <option value="">Select</option>
-                                        @foreach ($subComapnys as $subComapny)
-                                            <option value="{{ $subComapny->id }}"
-                                                {{ old('sub_company_id') == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('sub_company_id')
-                                        <div class="text-danger">{{ $message }}</div>
+                                
                                     @enderror
                                 </div>
                                 <!-- Vendor Field -->
@@ -94,12 +84,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <!-- Item Selection -->
-                                <div class="col-md-3 mb-3">
-                                    <label for="category" class="form-label">Category</label>
-                                    <select class="form-select" id="category">
-                                        <option selected>Select</option>
-                                    </select>
-                                    <div id="item_error" class="text-danger"></div>
+                                
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="item" class="form-label">Item</label>
@@ -536,55 +521,30 @@
         
     
         $(document).ready(function () {
-            // **AJAX: Get Vendors by Sub Company**
-            $('#sub_company_id').on('change', function () {
-                let subCompanyId = $(this).val();
-                let vendorDropdown = $('#vendor');
-                let categoryDropdown = $('#category');
-        
-                if (subCompanyId) {
-                    $.ajax({
-                        url: `{{ route('ajax.getVendors', ['sub_company_id' => '__ID__']) }}`.replace('__ID__', subCompanyId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            vendorDropdown.empty().append('<option value="">Select</option>');
-                            $.each(data, function (index, vendor) {
-                                vendorDropdown.append(`<option value="${vendor.id}" data-state="${vendor.state}">${vendor.full_name}</option>`);
-                            });
-                        }
-                    });
-        
-                    $.ajax({
-                        url: `{{ route('ajax.getCategories', ['sub_company_id' => '__ID__']) }}`.replace('__ID__', subCompanyId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            categoryDropdown.empty().append('<option value="">Select</option>');
-                            $.each(data, function (index, category) {
-                                categoryDropdown.append(`<option value="${category.id}">${category.name}</option>`);
-                            });
-                        }
+            // **AJAX: Get Vendors and Items on load**
+            let vendorDropdown = $('#vendor');
+            let itemDropdown = $('#item');
+            
+            $.ajax({
+                url: `{{ route('ajax.getVendors') }}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    vendorDropdown.empty().append('<option value="">Select</option>');
+                    $.each(data, function (index, vendor) {
+                        vendorDropdown.append(`<option value="${vendor.id}" data-state="${vendor.state}">${vendor.full_name}</option>`);
                     });
                 }
             });
-        
-            // **AJAX: Get Items by Category**
-            $('#category').on('change', function () {
-                let categoryId = $(this).val();
-                let itemDropdown = $('#item');
-        
-                if (categoryId) {
-                    $.ajax({
-                        url: `{{ route('ajax.getItems', ['category_id' => '__ID__']) }}`.replace('__ID__', categoryId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            itemDropdown.empty().append('<option selected>Select</option>');
-                            $.each(data, function (index, item) {
-                                itemDropdown.append(`<option value="${item.id}" data-tax="${item.tax.rate}" data-variation="${item.variation.name}" data-hsn="${item.hsn_hac}">${item.name}</option>`);
-                            });
-                        }
+
+            $.ajax({
+                url: `{{ route('ajax.getAllItems') }}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    itemDropdown.empty().append('<option value="">Select</option>');
+                    $.each(data, function (index, item) {
+                        itemDropdown.append(`<option value="${item.id}" data-tax="${item.tax.rate}" data-variation="${item.variation.name}" data-hsn="${item.hsn_hac}">${item.name}</option>`);
                     });
                 }
             });

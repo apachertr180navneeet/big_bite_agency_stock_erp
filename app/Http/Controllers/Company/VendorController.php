@@ -11,8 +11,7 @@ use App\Models\{
     Item,
     city,
     State,
-    Pincode,
-    SubCompany
+    Pincode
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 
@@ -27,9 +26,8 @@ class VendorController extends Controller
     {
         $states = State::all();
 
-        $subcompany = SubCompany::where('status','active')->get();
         // Pass the company and comId to the view
-        return view('company.vendor.index', compact('states','subcompany'));
+        return view('company.vendor.index', compact('states'));
     }
 
     /**
@@ -44,9 +42,8 @@ class VendorController extends Controller
 
         $compId = $user->company_id;
 
-        $items = User::join('sub_company', 'users.sub_company_id', '=', 'sub_company.id')
-        ->where('users.role', 'vendor')
-        ->where('users.company_id', $compId)->select('users.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
+        $items = User::where('users.role', 'vendor')
+        ->where('users.company_id', $compId)->select('users.*') // Adjust the select fields as needed
         ->orderBy('users.id', 'desc')
         ->get();
 
@@ -102,7 +99,6 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Validation rules
         $rules = [
-            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:20|unique:users,phone',
@@ -132,7 +128,6 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Save the User data
         $dataUser = [
-            'sub_company_id' => $request->sub_company_id,
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -181,7 +176,6 @@ class VendorController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
             'phone' => 'nullable|string|max:20',

@@ -80,7 +80,7 @@
                         </div>
                         <div>
                             <h4 style="color: #000">Invoice #{{ $salesReport->dispatch_number }}</h4>
-                            <h5 style="color: #000">Invoice By {{ $subCompany->name }}</h5>
+                            
                             <div class="me-1">
                                 <span class="me-1" style="color: #000">Date:</span>
                                 <span class="fw-medium" style="color: #000">{{ $salesReport->date }}</span>

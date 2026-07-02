@@ -37,16 +37,7 @@
                                 <div id="invoice-error" class="text-danger"></div>
                             </div>
                             <!-- Sub Company Field -->
-                            <div class="col-md-6 mb-3">
-                                <label for="sub_company_id" class="form-label">Sub Company</label>
-                                <select class="form-select" id="sub_company_id" name="sub_company_id" required>
-                                    <option value="">Select</option>
-                                    @foreach ($subComapnys as $subComapny)
-                                        <option value="{{ $subComapny->id }}"
-                                            {{ $purchaseBook->sub_company_id == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div id="sub_company_id-error" class="text-danger"></div>
+                            
                             </div>
                             <!-- Vendor Field -->
                             <div class="col-md-6 mb-3">

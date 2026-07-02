@@ -35,11 +35,7 @@
                                     <input type="text" class="form-control" id="dispatch" name="dispatch"
                                         value="{{ $salesBook->dispatch_number }}" readonly>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label">Sub Company</label>
-                                    <input type="text" class="form-control" id="weight" name="weight"
-                                        value="{{ $subCompany->name }}" readonly>
-                                </div>
+                                
                                 <!-- customer Field -->
                                 <div class="col-md-6 mb-3">
                                     <label for="customer" class="form-label">Costomer</label>

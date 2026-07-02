@@ -11,8 +11,7 @@ use App\Models\{
     Item,
     city,
     State,
-    Pincode,
-    SubCompany
+    Pincode
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 
@@ -27,9 +26,8 @@ class CustomerController extends Controller
     {
         $states = State::all();
 
-        $subcompany = SubCompany::where('status','active')->get();
         // Pass the company and comId to the view
-        return view('company.customer.index', compact('states','subcompany'));
+        return view('company.customer.index', compact('states'));
     }
 
     /**
@@ -44,9 +42,8 @@ class CustomerController extends Controller
 
         $compId = $user->company_id;
 
-        $items = User::join('sub_company', 'users.sub_company_id', '=', 'sub_company.id')
-        ->where('users.role', 'customer')
-        ->where('users.company_id', $compId)->select('users.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
+        $items = User::where('users.role', 'customer')
+        ->where('users.company_id', $compId)->select('users.*') // Adjust the select fields as needed
         ->orderBy('users.id', 'desc')
         ->get();
 
@@ -102,7 +99,6 @@ class CustomerController extends Controller
         $compId = $user->company_id;
         // Validation rules
         $rules = [
-            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:20|unique:users,phone',
@@ -130,7 +126,6 @@ class CustomerController extends Controller
 
         // Save the User data
         $dataUser = [
-            'sub_company_id' => $request->sub_company_id,
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -162,7 +157,6 @@ class CustomerController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
             'phone' => 'nullable|string|max:20|unique:users,phone,' . $request->id,
@@ -173,7 +167,7 @@ class CustomerController extends Controller
 
         $user = User::find($request->id);
         if ($user) {
-            $user->update($request->only(['sub_company_id', 'full_name', 'email', 'phone', 'address', 'gst_no']));
+            $user->update($request->only(['full_name', 'email', 'phone', 'address', 'gst_no']));
             return response()->json(['success' => true, 'message' => 'User Update Successfully']);
         }
 

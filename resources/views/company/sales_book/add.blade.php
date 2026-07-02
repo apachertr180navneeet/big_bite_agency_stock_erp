@@ -46,17 +46,7 @@
                                     <input type="text" class="form-control" id="dispatch" name="dispatch"
                                         value="{{ $invoiceNumber }}" readonly>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="sub_company_id" class="form-label">Sub Company</label>
-                                    <select class="form-select" id="sub_company_id" name="sub_company_id" required>
-                                        <option value="">Select</option>
-                                        @foreach ($subComapnys as $subComapny)
-                                            <option value="{{ $subComapny->id }}"
-                                                {{ old('sub_company_id') == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('sub_company_id')
-                                        <div class="text-danger">{{ $message }}</div>
+                                
                                     @enderror
                                 </div>
                                 <!-- customer Field -->
@@ -80,12 +70,7 @@
                             <!-- Item details form -->
                             <div class="row">
                                 <!-- Item Selection -->
-                                <div class="col-md-3 mb-3">
-                                    <label for="category" class="form-label">Category</label>
-                                    <select class="form-select" id="category">
-                                        <option selected>Select</option>
-                                    </select>
-                                    <div id="item_error" class="text-danger"></div>
+                                
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="item" class="form-label">Item</label>
@@ -499,90 +484,232 @@
             });
         
             // **Update GST When Vendor Changes**
+                                </div>
+                            </div>
+                        
+                            <!-- Save Button -->
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+@endsection
+
+
+@section('script')
+    <script>
+        $(document).ready(function () {
+            let itemCount = 0;
+            let totalTax = 0;
+            let totalCess = 0;
+            let grandTotal = 0;
+            let amountBeforeTax = 0;
+        
+            const $vendor = $('#customer');
+            const $companyState = $('#companyState');
+            const $cgst = $('#cgst');
+            const $sgst = $('#sgst');
+            const $igst = $('#igst');
+            const $amountBeforeTax = $('#amount_before_tax');
+            const $grandTotal = $('#grand_total');
+            const $otherExpense = $('#other_expense');
+            const $discount = $('#discount');
+            const $roundOff = $('#round_off');
+            const $givenAmount = $('#given_amount');
+            const $remainingBalance = $('#remaining_blance');
+            const $totalCess = $('#total_cess'); // New CESS field
+            const $itemsTableBody = $('#itemsTable tbody');
+        
+            // **Calculate GST & Update Totals**
+            function updateTax() {
+                totalTax = 0;
+                totalCess = 0;
+        
+                $itemsTableBody.find('tr').each(function () {
+                    totalTax += parseFloat($(this).find('input[name="taxes[]"]').val()) || 0;
+                    totalCess += parseFloat($(this).find('input[name="cess[]"]').val()) || 0;
+                });
+        
+                $totalCess.val(totalCess.toFixed(2)); // Update total CESS field
+        
+                const selectedState = $vendor.find('option:selected').data('state');
+                const companyStateValue = $companyState.val();
+        
+                if (companyStateValue == selectedState) {
+                    let cgst = totalTax / 2;
+                    $cgst.val(cgst.toFixed(2));
+                    $sgst.val(cgst.toFixed(2));
+                    $igst.val('0.00');
+                } else {
+                    $igst.val(totalTax.toFixed(2));
+                    $cgst.val('0.00');
+                    $sgst.val('0.00');
+                }
+            }
+        
+            // **Calculate and Update All Totals**
+            function calculateTotal() {
+                let amountBeforeTax = parseFloat($amountBeforeTax.val()) || 0;
+                let discount = parseFloat($discount.val()) || 0;
+                let otherExpense = parseFloat($otherExpense.val()) || 0;
+                let igst = parseFloat($igst.val()) || 0;
+                let cgst = parseFloat($cgst.val()) || 0;
+                let sgst = parseFloat($sgst.val()) || 0;
+        
+                // **Calculate Discounted Amount**
+                let discountValue = amountBeforeTax - discount;
+                if (discountValue < 0) discountValue = 0; // Prevent negative values
+                $("#discount_value").val(discountValue.toFixed(2));
+        
+                // **Calculate Total Before Tax After Discount**
+                let totalBeforeTax = discountValue;
+        
+                // **Calculate Total Tax**
+                let totalTax = igst + cgst + sgst;
+        
+                // **Calculate Grand Total Before Rounding**
+                grandTotal = totalBeforeTax + totalTax + totalCess + otherExpense;
+        
+                // **Calculate Round Off**
+                let decimalPart = grandTotal - Math.floor(grandTotal);
+                let roundOff = 0;
+        
+                if (decimalPart >= 0.75) {
+                    roundOff = 1 - decimalPart;  // Round Up
+                } else if (decimalPart <= 0.50) {
+                    roundOff = -decimalPart; // Round Down
+                }
+        
+                let finalTotal = grandTotal + roundOff;
+        
+                // **Set Values in Input Fields**
+                $roundOff.val(roundOff.toFixed(2));
+                $grandTotal.val(finalTotal.toFixed(2));
+            }
+        
+            // **Trigger Calculation on Input Changes**
+            $("#amount_before_tax, #discount, #other_expense, #igst, #cgst, #sgst").on("input", function () {
+                calculateTotal();
+            });
+        
+            // **Update Remaining Balance**
+            function updateRemainingBalance() {
+                let givenAmount = parseFloat($givenAmount.val()) || 0;
+                let finalTotal = parseFloat($grandTotal.val()) || 0;
+                let remainingBalance = finalTotal - givenAmount;
+                $remainingBalance.val(remainingBalance.toFixed(2));
+            }
+        
+            // **Event Listener for Given Amount**
+            $givenAmount.on("input", function () {
+                updateRemainingBalance();
+            });
+        
+            // **Add Item to Table**
+            $('#addItem').on('click', function () {
+                const category = $('#category option:selected').text();
+                const categoryId = $('#category').val();
+                const item = $('#item option:selected').text();
+                const itemId = $('#item').val();
+                const hsn = $('#item option:selected').data('hsn');
+                const taxRate = $('#item option:selected').data('tax') || 0;
+                const qty = parseFloat($('#qty').val());
+                const amountPerUnit = parseFloat($('#amount').val());
+        
+                if (itemId && !isNaN(qty) && !isNaN(amountPerUnit)) {
+                    const totalAmount = qty * amountPerUnit;
+                    const tax = totalAmount * (taxRate / 100);
+                    const totalWithTax = totalAmount + tax;
+                    const cess = taxRate === 28 ? (totalAmount * 12) / 100 : 0; // CESS calculation
+        
+                    itemCount++;
+                    amountBeforeTax += totalAmount;
+                    totalTax += tax;
+                    totalCess += cess; // Update total CESS
+                    grandTotal += totalWithTax;
+        
+                    $amountBeforeTax.val(amountBeforeTax.toFixed(2));
+                    $totalCess.val(totalCess.toFixed(2)); // Update total CESS field
+        
+                    // Append new item row
+                    $itemsTableBody.append(`
+                        <tr>
+                            <td>${itemCount}</td>
+                            <td>${item}<input type="hidden" name="items[]" value="${itemId}"></td>
+                            <td>${qty}<input type="hidden" name="quantities[]" value="${qty}"></td>
+                            <td>${hsn}</td>
+                            <td>${category}<input type="hidden" name="categorys[]" value="${categoryId}"></td>
+                            <td>${amountPerUnit.toFixed(2)}<input type="hidden" name="rates[]" value="${amountPerUnit.toFixed(2)}"></td>
+                            <td>${tax.toFixed(2)}<input type="hidden" name="taxes[]" value="${tax.toFixed(2)}"></td>
+                            <td>${cess.toFixed(2)}<input type="hidden" name="cess[]" value="${cess.toFixed(2)}"></td>
+                            <td>${totalAmount.toFixed(2)}<input type="hidden" name="totalAmounts[]" value="${totalAmount.toFixed(2)}"></td>
+                            <td><button type="button" class="btn btn-danger btn-sm removeItem">Remove</button></td>
+                        </tr>
+                    `);
+        
+                    updateTax();
+                    calculateTotal();
+                }
+            });
+        
+            // **Remove Item from Table**
+            $(document).on('click', '.removeItem', function () {
+                const row = $(this).closest('tr');
+                const taxToRemove = parseFloat(row.find('input[name="taxes[]"]').val()) || 0;
+                const cessToRemove = parseFloat(row.find('input[name="cess[]"]').val()) || 0;
+                const amountToRemove = parseFloat(row.find('input[name="totalAmounts[]"]').val()) || 0;
+        
+                totalTax -= taxToRemove;
+                totalCess -= cessToRemove;
+                grandTotal -= amountToRemove + taxToRemove + cessToRemove;
+                amountBeforeTax -= amountToRemove;
+        
+                row.remove();
+                itemCount--;
+        
+                updateTax();
+                calculateTotal();
+            });
+        
+            // **Update GST When Vendor Changes**
             $vendor.on('change', function () {
                 updateTax();
             });
         });
 
-        // Get Vedor by sub company
-        $(document).ready(function () {
-            $('#sub_company_id').on('change', function () {
-                let subCompanyId = $(this).val();
-                let vendorDropdown = $('#customer');
-                let categoryDropdown = $('#category');
-        
-                // Define URLs and replace the placeholder dynamically
-                let vendorUrl = "{{ route('ajax.getCustomers', ['sub_compnay_id' => '__ID__']) }}".replace('__ID__', subCompanyId);
-                let categoryUrl = @json(route('ajax.getCategories', ['sub_company_id' => '__ID__']));
-        
-                if (subCompanyId) {
-                    // Fetch Vendors
-                    $.ajax({
-                        url: vendorUrl,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (datavendor) {
-                            vendorDropdown.empty().append('<option value="">Select</option>');
-                            $.each(datavendor, function (index, vendor) {
-                                vendorDropdown.append(`<option value="${vendor.id}" data-state="${vendor.state}">${vendor.full_name}</option>`);
-                            });
-                        }
-                    });
-        
-                    // Fetch Categories
-                    $.ajax({
-                        url: categoryUrl.replace('__ID__', subCompanyId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            categoryDropdown.empty().append('<option value="">Select</option>');
-                            $.each(data, function (index, category) {
-                                categoryDropdown.append(`<option value="${category.id}">${category.name}</option>`);
-                            });
-                        }
-                    });
-                } else {
-                    // Reset dropdowns if no sub-company is selected
-                    vendorDropdown.empty().append('<option value="">Select</option>');
-                    categoryDropdown.empty().append('<option value="">Select</option>');
-                }
-            });
+        // Get Customer and items on load
+        let customerDropdown = $('#customer');
+        let itemDropdown = $('#item');
+
+        $.ajax({
+            url: "{{ route('ajax.getCustomers') }}",
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                customerDropdown.empty().append('<option value="">Select</option>');
+                $.each(data, function (index, customer) {
+                    customerDropdown.append(`<option value="${customer.id}" data-state="${customer.state}">${customer.full_name}</option>`);
+                });
+            }
         });
-        
-        // Get Item by category
-        $(document).ready(function () {
-            $('#category').on('change', function () {
-                let categoryId = $(this).val();
-                let itemDropdown = $('#item');
-        
-                // Define the route with a placeholder and replace it dynamically
-                let itemUrl = @json(route('ajax.getItems', ['category_id' => '__ID__']));
-        
-                if (categoryId) {
-                    $.ajax({
-                        url: itemUrl.replace('__ID__', categoryId),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            itemDropdown.empty().append('<option selected>Select</option>');
-                            $.each(data, function (index, item) {
-                                itemDropdown.append(`
-                                            <option 
-                                                value="${item.id}" 
-                                                data-tax="${item.tax.rate}" 
-                                                data-variation="${item.variation.name}" 
-                                                data-hsn="${item.hsn_hac}">
-                                                ${item.name}
-                                            </option>
-                                        `);
-                            });
-                        }
-                    });
-                } else {
-                    // Reset item dropdown if no category is selected
-                    itemDropdown.empty().append('<option selected>Select</option>');
-                }
-            });
+
+        $.ajax({
+            url: "{{ route('ajax.getAllItems') }}",
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                itemDropdown.empty().append('<option value="">Select</option>');
+                $.each(data, function (index, item) {
+                    itemDropdown.append(`<option value="${item.id}" data-tax="${item.tax.rate}" data-variation="${item.variation.name}" data-hsn="${item.hsn_hac}">${item.name}</option>`);
+                });
+            }
         });
     </script>
 @endsection

@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\{
         User,
         Company,
-        Variation,
-        SubCompany
+        Variation
     };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 
@@ -21,9 +20,8 @@ class VariationController extends Controller
      */
     public function index(Request $request)
     {
-        $subcompany = SubCompany::where('status','active')->get();
         // Pass the company and comId to the view
-        return view('company.variation.index',compact('subcompany'));
+        return view('company.variation.index');
     }
 
     /**
@@ -38,9 +36,8 @@ class VariationController extends Controller
 
         $compId = $user->company_id;
 
-        $variations = Variation::join('sub_company', 'variations.sub_company_id', '=', 'sub_company.id')
-        ->where('variations.company_id', $compId)
-        ->select('variations.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
+        $variations = Variation::where('variations.company_id', $compId)
+        ->select('variations.*') // Adjust the select fields as needed
         ->orderBy('variations.id', 'desc')
         ->get();
         return response()->json(['data' => $variations]);
@@ -113,8 +110,7 @@ class VariationController extends Controller
         $dataUser = [
             'name' => $request->name,
             'code' => $request->code ?? (string) rand(100000, 999999),
-            'company_id' => $compId,
-            'sub_company_id' => $request->sub_company
+            'company_id' => $compId
         ];
         Variation::create($dataUser);
 

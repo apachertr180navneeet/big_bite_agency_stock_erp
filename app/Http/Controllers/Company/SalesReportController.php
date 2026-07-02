@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, SalesBook, SalesBookItem, Company,Bank,SubCompany};
+use App\Models\{User, SalesBook, SalesBookItem, Company,Bank};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -86,14 +86,13 @@ class SalesReportController extends Controller
             ->select('sales_books.*', 'users.full_name as customer_name', 'users.city as customer_city' , 'users.address as customer_address', 'users.state as customer_state', 'users.gst_no as customer_gst_no', 'users.phone as customer_phone')
             ->find($id);
 
-        $subCompany = SubCompany::find($salesReport->sub_company_id);
 
         $bank = Bank::where('company_id', $compId)->where('show_invoice', '1')->first();
 
         $grand_total = $salesReport->grand_total;
         $grandtotalwrod = $this->convertNumberToWords($grand_total);
 
-        return view('company.sales_report.print', compact('salesReport','grandtotalwrod','bank','companyDetail','subCompany'));
+        return view('company.sales_report.print', compact('salesReport','grandtotalwrod','bank','companyDetail'));
     }
 
     public function convertNumberToWords($number) {

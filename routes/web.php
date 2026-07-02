@@ -369,11 +369,12 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::get('/getCities/{state}', 'getCities')->name('getCities');
         Route::get('/getPincodes/{city}', 'getPincodes')->name('getPincodes');
         Route::post('/check-stock', 'checkStock')->name('checkStock');
-        Route::get('/category/{sub_company}', 'getCategory')->name('getCategory');
-        Route::get('/get-vendors/{sub_company_id}', 'getVendors')->name('getVendors');
-        Route::get('/get-categories/{sub_company_id}', 'getCategories')->name('getCategories');
+        Route::get('/category', 'getCategory')->name('getCategory');
+        Route::get('/get-vendors', 'getVendors')->name('getVendors');
+        Route::get('/get-categories', 'getCategories')->name('getCategories');
+        Route::get('/get-all-items', 'getAllItems')->name('getAllItems');
         Route::get('/get-items/{category_id}', 'getItems')->name('getItems');
-        Route::get('/get-customers/{sub_compnay_id}', 'getCustomers')->name('getCustomers');
+        Route::get('/get-customers', 'getCustomers')->name('getCustomers');
         Route::get('/get-purchase-details/{id}', 'getPurchaseDetails')->name('getPurchaseDetails');
     });
 });

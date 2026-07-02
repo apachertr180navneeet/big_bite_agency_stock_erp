@@ -131,7 +131,7 @@
             // Collect form data
             let data = {
                 name: $('#name').val(),
-                sub_company: $('#sub_company').val(),
+                
                 _token: $('meta[name="csrf-token"]').attr('content')
             };
 
@@ -176,7 +176,7 @@
                 success: function(data) {
                     $('#compid').val(data.id);
                     $('#editname').val(data.name);
-                    $('#edit_sub_company').val(data.sub_compnay_id);
+                    
 
                     $('#editModal').modal('show');
                     setFlash("success", 'Transport found successfully.');
@@ -196,7 +196,7 @@
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(), // Ensure consistency in field names
-                    sub_compnay_id: $('#edit_sub_company').val(), // Ensure consistency in field names
+                     // Ensure consistency in field names
                     id: userId
                 },
                 success: function(response) {

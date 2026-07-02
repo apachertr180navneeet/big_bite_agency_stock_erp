@@ -26,7 +26,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Dispatch number</th>
-                                    <th>Sub Company</th>
+                                    
                                     <th>Amount</th>
                                     <th>Customer</th>
                                     <th>Action</th>
@@ -63,7 +63,7 @@
                     data: "date",
                 },
                 { data: "dispatch_number" },
-                { data: "sub_company_name" },
+                
                 { data: "grand_total" },
                 { data: "customer_name" },
                 {

@@ -13,7 +13,7 @@ class PurchesReturnBookItem extends Model
     protected $table = 'purches_return_book_items';
 
     protected $fillable = [
-        'purches_return_book_id', 'purches_book_item_id', 'category','returned_quantity', 'rate', 'tax', 'cess', 'total_return_amount',
+        'purches_return_book_id', 'purches_book_item_id', 'returned_quantity', 'rate', 'tax', 'cess', 'total_return_amount',
         'status'
     ];
 

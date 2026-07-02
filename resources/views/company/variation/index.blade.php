@@ -26,7 +26,7 @@
                                 <tr>
                                     {{--  <th>Variation code</th>  --}}
                                     <th>Name</th>
-                                    <th>Sub Company Name</th>
+                                    
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -54,16 +54,7 @@
                         <input type="text" id="name" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="sub_company" class="form-label">Sub Company</label>
-                        <select id="sub_company" class="form-select form-select">
-                            <option value="">select</option>
-                            @foreach ( $subcompany as $var )
-                                <option value="{{ $var->id }}">{{ $var->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                 </div>
             </div>
             <div class="modal-footer">
@@ -89,16 +80,7 @@
                         <input type="text" id="editname" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_sub_company" class="form-label">Sub Company</label>
-                        <select id="edit_sub_company" class="form-select form-select">
-                            <option value="">select</option>
-                            @foreach ( $subcompany as $var )
-                                <option value="{{ $var->id }}">{{ $var->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+                    
                 </div>
             </div>
             <div class="modal-footer">
@@ -120,7 +102,7 @@
             },
             columns: [
                 { data: "name" },
-                { data: "sub_company_name" },
+                
                 {
                     data: "status",
                     render: (data, type, row) => {
@@ -154,7 +136,7 @@
             // Collect form data
             let data = {
                 name: $('#name').val(),
-                sub_company: $('#sub_company').val(),
+                
                 _token: $('meta[name="csrf-token"]').attr('content')
             };
 
@@ -199,7 +181,7 @@
                 success: function(data) {
                     $('#compid').val(data.id);
                     $('#editname').val(data.name);
-                    $('#edit_sub_company').val(data.sub_company_id);
+                    
 
                     $('#editModal').modal('show');
                     setFlash("success", 'Variation found successfully.');
@@ -219,7 +201,7 @@
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(), // Ensure consistency in field names
-                    sub_company_id: $('#edit_sub_company').val(), // Ensure consistency in field names
+                     // Ensure consistency in field names
                     id: userId
                 },
                 success: function(response) {

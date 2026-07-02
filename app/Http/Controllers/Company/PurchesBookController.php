@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State, SubCompany, Transport};
+use App\Models\{User, Company, Tax, Item, PurchesBook, PurchesBookItem, StockReport, State, Transport};
 use Illuminate\Support\Facades\{Auth, DB, Mail, Hash, Validator, Session};
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -48,9 +48,8 @@ class PurchesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $purchesBooks = PurchesBook::leftJoin('users', 'purches_books.vendor_id', '=', 'users.id')
-            ->leftJoin('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
-            ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
+            ->select('purches_books.*', 'users.full_name as vendor_name')
             ->orderByDesc('purches_books.id')
             ->get();
 
@@ -76,10 +75,7 @@ class PurchesBookController extends Controller
         $companyShortCode = $companyDetails->short_code;
         $companyState = $companyDetails->state;
 
-        $activeSubComapny = SubCompany::where([
-            ['company_id', $companyId],
-            ['status', 'active']
-        ])->get();
+
 
         // Get the maximum invoice number for the company's purchases
         $latestInvoiceNumber = PurchesBook::where('company_id', $companyId)->max('invoice_number');
@@ -104,7 +100,6 @@ class PurchesBookController extends Controller
             'currentDate' => $currentDate,
             'companyState' => $companyState,
             'states' => $states,
-            'subComapnys' => $activeSubComapny,
             'transports' => $transports
         ]);
     }
@@ -122,7 +117,6 @@ class PurchesBookController extends Controller
             $purchesBook = PurchesBook::create([
                 'date' => $request->date,
                 'company_id' => $compId,
-                'sub_company_id' => $request->sub_company_id,
                 'invoice_number' => $request->invoice,
                 'vendor_id' => $request->vendor,
                 'transport' => $request->transport,
@@ -148,7 +142,6 @@ class PurchesBookController extends Controller
             foreach ($request->items as $index => $itemId) {
                 $item = PurchesBookItem::create([
                     'purches_book_id' => $purchesBook->id,
-                    'category' => $request->categorys[$index],
                     'item_id' => $itemId,
                     'quantity' => $request->quantities[$index],
                     'preturn' => 0,
@@ -255,12 +248,9 @@ class PurchesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        $subComapnys = SubCompany::where([
-            ['company_id', $compId],
-            ['status', 'active']
-        ])->get();
 
-        return view('company.purches_book.edit', compact('purchaseBook', 'vendors', 'items','companyState', 'subComapnys'));
+
+        return view('company.purches_book.edit', compact('purchaseBook', 'vendors', 'items','companyState'));
     }
 
     public function view($id)
@@ -281,7 +271,7 @@ class PurchesBookController extends Controller
         
 
 
-        $subCompany = SubCompany::find($purchaseBook->sub_company_id);
+
 
 
         // Fetch all active vendors for the user's company
@@ -297,7 +287,7 @@ class PurchesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState','subCompany','tranportname'));
+        return view('company.purches_book.view', compact('purchaseBook', 'vendors', 'items','companyState','tranportname'));
     }
 
     public function update(Request $request, $id)
@@ -339,7 +329,7 @@ class PurchesBookController extends Controller
         $purchaseBook->date = $request->date;
         $purchaseBook->invoice_number = $request->invoice;
         $purchaseBook->vendor_id = $request->vendor;
-        $purchaseBook->sub_company_id = $request->sub_company_id;
+
         $purchaseBook->transport = $request->transport;
         $purchaseBook->igst = $request->igst;
         $purchaseBook->cgst = $request->cgst;
@@ -546,10 +536,9 @@ class PurchesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $purchesBooks = PurchesBook::leftJoin('users', 'purches_books.vendor_id', '=', 'users.id')
-            ->join('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
             ->where('purches_books.purches_return', '1')
-            ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
+            ->select('purches_books.*', 'users.full_name as vendor_name')
             ->orderByDesc('purches_books.id')
             ->get();
 

@@ -13,7 +13,6 @@ use App\Models\{
     State,
     Pincode,
     StockReport,
-    SubCompany,
     PurchesBook, 
     PurchesBookItem
 };
@@ -74,25 +73,35 @@ class LocationController extends Controller
     }
 
     // Manage to get category by sub company
-    public function getCategory($sub_company)
+    public function getCategory()
     {
-        $categories = Variation::where('sub_company_id', $sub_company)->get(['id', 'name']);
+        $compId = \Illuminate\Support\Facades\Auth::user()->company_id;
+        $categories = Variation::where('company_id', $compId)->get(['id', 'name']);
         return response()->json($categories);
     }
 
-    public function getVendors($sub_company_id)
+    public function getVendors()
     {
-        $vendors = User::where('sub_company_id', $sub_company_id)->where('role', 'vendor')->where('status', 'active')->get();
+        $compId = \Illuminate\Support\Facades\Auth::user()->company_id;
+        $vendors = User::where('company_id', $compId)->where('role', 'vendor')->where('status', 'active')->get();
 
         return response()->json($vendors);
     }
 
 
-    public function getCategories($sub_company_id)
+    public function getCategories()
     {
-        $categories = Variation::where('sub_company_id', $sub_company_id)->where('status', 'active')->get();
+        $compId = \Illuminate\Support\Facades\Auth::user()->company_id;
+        $categories = Variation::where('company_id', $compId)->where('status', 'active')->get();
 
         return response()->json($categories);
+    }
+
+    public function getAllItems()
+    {
+        $compId = \Illuminate\Support\Facades\Auth::user()->company_id;
+        $items = Item::with(['variation:id,name', 'tax:id,rate'])->where('company_id', $compId)->where('status', 'active')->get(['id', 'name', 'tax_id' , 'company_id' , 'variation_id', 'hsn_hac']);
+        return response()->json($items);
     }
 
     public function getItems($category_id)
@@ -101,9 +110,10 @@ class LocationController extends Controller
         return response()->json($items);
     }
 
-    public function getCustomers($sub_company_id)
+    public function getCustomers()
     {
-        $customers = User::where('sub_company_id', $sub_company_id)->where('role', 'customer')->where('status', 'active')->get();
+        $compId = \Illuminate\Support\Facades\Auth::user()->company_id;
+        $customers = User::where('company_id', $compId)->where('role', 'customer')->where('status', 'active')->get();
 
         return response()->json($customers);
     }
