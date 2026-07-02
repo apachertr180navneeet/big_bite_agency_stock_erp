@@ -56,13 +56,10 @@ class AdminAuthController extends Controller
             ]);
             $user = User::where('role','admin')->where('email',$request->email)->first();
             if($user){
-                $credentials = $request->only("email", "password");
                 if(Auth::attempt([
                         'email' => $request->email,
                         'password' => $request->password,
-                        'role' => function ($query) {
-                            $query->where('role','admin');
-                        }
+                        'role' => 'admin'
                     ]))
                 {
                     return redirect()->route("admin.dashboard")->with("success", "Welcome to your dashboard.");
@@ -89,13 +86,13 @@ class AdminAuthController extends Controller
         $data = $request->all();
         $check = $this->create($data);
 
-        return redirect("admin.dashboard")->with("success","Great! You have Successfully loggedin");
+        return redirect()->route("admin.dashboard")->with("success","Great! You have Successfully loggedin");
     }
 
     public function create(array $data)
     {
         return User::create([
-            "name" => $data["name"],
+            "full_name" => $data["name"],
             "email" => $data["email"],
             "password" => Hash::make($data["password"]),
         ]);
@@ -208,7 +205,7 @@ class AdminAuthController extends Controller
         try{
             Session::flush();
             Auth::logout();
-            return redirect()->route("admin.login")->withSuccess('Logout Successful!');
+            return redirect()->route("admin.login")->with('success', 'Logout Successful!');
         }
         catch(Exception $e){
             return back()->with("error",$e->getMessage());

@@ -51,8 +51,7 @@ class AuthController extends Controller
             ],200);
         }
 
-        // $code = rand(1000,9999);
-        $code = '1234';
+        $code = rand(1000,9999);
         $date = date('Y-m-d H:i:s');
         $currentDate = strtotime($date);
         $futureDate = $currentDate+(60*120);
@@ -100,7 +99,7 @@ class AuthController extends Controller
                     ],200);
                 }else{
                     return response()->json([
-                        'status' => true,
+                        'status' => false,
                         'message' =>  'Verification code is expired.',
                     ],200);
                 }
@@ -165,7 +164,7 @@ class AuthController extends Controller
             $app_user->slug = Helper::slug('users',$app_user->full_name);
             $app_user->email = $request->email;
             $app_user->phone = $request->phone;
-            $app_user->password = $request->password;
+            $app_user->password = bcrypt($request->password);
             $app_user->address = $request->address;
             $app_user->area = $request->area ?? '';
             $app_user->city = $request->city ?? '';
@@ -225,7 +224,7 @@ class AuthController extends Controller
         }
         if($currentTime > $phone_user->otp_expire_time){
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' =>  'Otp time is expired.',
             ],200);
         }
@@ -540,7 +539,11 @@ class AuthController extends Controller
                         }
                     }
                     else{
-                        $user->$key = $value;
+                        // Only allow safe fields to be updated
+                        $safeFields = ['phone', 'address', 'area', 'city', 'state', 'country', 'country_code', 'zipcode', 'latitude', 'longitude', 'bio', 'device_type', 'device_token', 'email'];
+                        if (in_array($key, $safeFields)) {
+                            $user->$key = $value;
+                        }
                     }
                 }
             }
@@ -583,6 +586,7 @@ class AuthController extends Controller
             $user->phone = uniqid().'_delete_'.$user->phone;
             $user->status = 'inactive';
             $user->save();
+            $user->delete(); // Proper soft-delete
             DB::commit();
             Auth::logout();
             return response()->json(array(

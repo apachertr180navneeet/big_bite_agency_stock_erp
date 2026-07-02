@@ -173,7 +173,7 @@ class CustomerController extends Controller
 
         $user = User::find($request->id);
         if ($user) {
-            $user->update($request->all());
+            $user->update($request->only(['sub_company_id', 'full_name', 'email', 'phone', 'address', 'gst_no']));
             return response()->json(['success' => true, 'message' => 'User Update Successfully']);
         }
 

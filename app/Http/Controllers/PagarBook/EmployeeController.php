@@ -35,10 +35,9 @@ class EmployeeController extends Controller
     public function getall(Request $request)
     {
         $user = Auth::user();
+        $compId = $user->company_id;
 
-        $compId = null;
-
-        $variation = User::where('role','employee')->orderBy('id', 'desc')->get();
+        $variation = User::where('role','employee')->where('company_id', $compId)->orderBy('id', 'desc')->get();
         return response()->json(['data' => $variation]);
     }
 
@@ -175,7 +174,6 @@ class EmployeeController extends Controller
         if ($request->hasFile('qr_scan')) {
             $file = $request->file('qr_scan');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $filePath = public_path('uploads/qr_scans') . '/' . $filename;
             $file->move(public_path('uploads/qr_scans'), $filename);
             
             // Save the full path in the database
@@ -245,6 +243,11 @@ class EmployeeController extends Controller
         $userId = $id;
         $empSalarys = EmpSalary::where('user_id',$id)->orderBy('id', 'desc')->get();
         $empDetail = User::where('role','employee')->where('id',$id)->orderBy('id', 'desc')->first();
+
+        if (!$empDetail) {
+            return redirect()->back()->with('error', 'Employee not found');
+        }
+
         $base_salary = $empDetail->base_salary;
         $addvanceAmount = AdvanceSalary::where('user_id',$id)->sum('amount');
         $totaldiductionAmount = EmpSalary::where('user_id',$id)->sum('diduction_amountfromadvance');

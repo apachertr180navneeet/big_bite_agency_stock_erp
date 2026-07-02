@@ -13,16 +13,13 @@ use Exception;
 
 class PurchesBookController extends Controller
 {
-    public function getLastDigit($str) {
-        // Use regular expression to find all digits in the string
-        preg_match_all('/\d/', $str, $matches);
-
-        // If there are digits found, return the last one
-        if (!empty($matches[0])) {
-            return end($matches[0]);
+    public function getLastNumber($str) {
+        // Use regular expression to find the trailing number in the string
+        if (preg_match('/(\d+)$/', $str, $matches)) {
+            return (int) $matches[1];
         }
 
-        // Return null or a message if no digits are found
+        // Return null if no digits are found
         return null;
     }
     /**
@@ -86,10 +83,9 @@ class PurchesBookController extends Controller
 
         // Get the maximum invoice number for the company's purchases
         $latestInvoiceNumber = PurchesBook::where('company_id', $companyId)->max('invoice_number');
-        $lastDigit = $this->getLastDigit($latestInvoiceNumber);
+        $lastNumber = $this->getLastNumber($latestInvoiceNumber);
         // Generate the next invoice number by incrementing the latest invoice or default to 1
-        $lastDigit = (int) $lastDigit; // Convert to integer
-        $nextInvoiceNumber = $lastDigit ? $lastDigit + 1 : 1;
+        $nextInvoiceNumber = $lastNumber ? $lastNumber + 1 : 1;
 
 
         // Format the invoice number to have 5 digits, with leading zeros if necessary
@@ -191,9 +187,9 @@ class PurchesBookController extends Controller
                 ->with('lastPurchesBook', $lastPurchesBook);
 
         } catch (\Exception $e) {
-            dd($e);
             // Rollback the transaction on error
             DB::rollback();
+            \Log::error('Purchase Book Store Error: ' . $e->getMessage());
 
             // Redirect with an error message and old input
             return redirect()->back()->with('error', 'An error occurred while saving the purchase book entry.');
@@ -530,8 +526,8 @@ class PurchesBookController extends Controller
             return redirect()->route('company.purches.book.index')->with('success', 'Return Added successfully.');
 
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
+            \Log::error('Purchase Return Error: ' . $e->getMessage());
             return redirect()->back()->withInput()->withErrors(['error' => 'An error occurred while updating the return.']);
         }
     }
@@ -549,7 +545,7 @@ class PurchesBookController extends Controller
         $compId = $user->company_id;
 
         // Fetch all purchase books for the user's company, including vendor details
-        $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
+        $purchesBooks = PurchesBook::leftJoin('users', 'purches_books.vendor_id', '=', 'users.id')
             ->join('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
             ->where('purches_books.purches_return', '1')

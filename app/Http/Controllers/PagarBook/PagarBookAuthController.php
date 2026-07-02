@@ -61,7 +61,6 @@ class PagarBookAuthController extends Controller
             $user = User::where('role','pagar_book')->where('email',$request->email)->first();
 
             if($user){
-                $credentials = $request->only("email", "password");
                 if(Auth::attempt([
                         'email' => $request->email,
                         'password' => $request->password,
@@ -100,13 +99,13 @@ class PagarBookAuthController extends Controller
         $data = $request->all();
         $check = $this->create($data);
 
-        return redirect("pagar.book.dashboard")->with("success","Great! You have Successfully loggedin");
+        return redirect()->route("pagar.book.dashboard")->with("success","Great! You have Successfully loggedin");
     }
 
     public function create(array $data)
     {
         return User::create([
-            "name" => $data["name"],
+            "full_name" => $data["name"],
             "email" => $data["email"],
             "password" => Hash::make($data["password"]),
         ]);
@@ -132,7 +131,7 @@ class PagarBookAuthController extends Controller
                 "created_at" => Carbon::now(),
             ]);
 
-            $new_link_token = url("company/reset-password/" . $token);
+            $new_link_token = url("pagar-book/reset-password/" . $token);
             Mail::send("pagar.book.email.forgot-password",["token" => $new_link_token, "email" => $request->email],
                 function ($message) use ($request) {
                     $message->to($request->email);
@@ -219,7 +218,7 @@ class PagarBookAuthController extends Controller
         try{
             Session::flush();
             Auth::logout();
-            return redirect()->route("pagar.book.login")->withSuccess('Logout Successful!');
+            return redirect()->route("pagar.book.login")->with('success', 'Logout Successful!');
         }
         catch(Exception $e){
             return back()->with("error",$e->getMessage());

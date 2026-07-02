@@ -61,13 +61,10 @@ class CompanyAuthController extends Controller
             $user = User::where('role','user')->where('email',$request->email)->first();
 
             if($user){
-                $credentials = $request->only("email", "password");
                 if(Auth::attempt([
                         'email' => $request->email,
                         'password' => $request->password,
-                        'role' => function ($query) {
-                            $query->where('role','user');
-                        }
+                        'role' => 'user'
                     ]))
                 {
                     $user = auth()->user();
@@ -102,13 +99,13 @@ class CompanyAuthController extends Controller
         $data = $request->all();
         $check = $this->create($data);
 
-        return redirect("company.dashboard")->with("success","Great! You have Successfully loggedin");
+        return redirect()->route("company.dashboard")->with("success","Great! You have Successfully loggedin");
     }
 
     public function create(array $data)
     {
         return User::create([
-            "name" => $data["name"],
+            "full_name" => $data["name"],
             "email" => $data["email"],
             "password" => Hash::make($data["password"]),
         ]);
@@ -221,7 +218,7 @@ class CompanyAuthController extends Controller
         try{
             Session::flush();
             Auth::logout();
-            return redirect()->route("company.login")->withSuccess('Logout Successful!');
+            return redirect()->route("company.login")->with('success', 'Logout Successful!');
         }
         catch(Exception $e){
             return back()->with("error",$e->getMessage());
@@ -282,11 +279,13 @@ class CompanyAuthController extends Controller
 
     public function companyDashboard()
     {
-        $categoryCount = Variation::where('status','active')->count();
-        $itemCount = Item::where('status','active')->count();
-        $subcompanyCount = SubCompany::where('status','active')->count();
-        $vendorCount = User::where('status','active')->where('role','vendor')->count();
-        $customerCount = User::where('status','active')->where('role','customer')->count();
+        $user = Auth::user();
+        $compId = $user->company_id;
+        $categoryCount = Variation::where('status','active')->where('company_id', $compId)->count();
+        $itemCount = Item::where('status','active')->where('company_id', $compId)->count();
+        $subcompanyCount = SubCompany::where('status','active')->where('company_id', $compId)->count();
+        $vendorCount = User::where('status','active')->where('role','vendor')->where('company_id', $compId)->count();
+        $customerCount = User::where('status','active')->where('role','customer')->where('company_id', $compId)->count();
         return view("company.dashboard.index",compact('categoryCount','itemCount','vendorCount','customerCount','subcompanyCount'));
     }
 

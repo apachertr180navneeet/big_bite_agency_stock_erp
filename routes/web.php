@@ -326,7 +326,6 @@ Route::prefix('company')->name('company.')->group(function () {
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
             Route::get('get/{id}', 'get')->name('get');
             Route::post('update', 'update')->name('update');
-            Route::delete('delete/{id}','destroy')->name('destroy');
         });
 
         // Sales Report Management Routes

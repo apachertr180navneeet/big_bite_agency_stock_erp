@@ -13,17 +13,14 @@ use Exception;
 
 class SalesBookController extends Controller
 {
-    public function getLastDigit($str)
+    public function getLastNumber($str)
     {
-        // Use regular expression to find all digits in the string
-        preg_match_all('/\d/', $str, $matches);
-
-        // If there are digits found, return the last one
-        if (!empty($matches[0])) {
-            return end($matches[0]);
+        // Use regular expression to find the trailing number in the string
+        if (preg_match('/(\d+)$/', $str, $matches)) {
+            return (int) $matches[1];
         }
 
-        // Return null or a message if no digits are found
+        // Return null if no digits are found
         return null;
     }
 
@@ -84,10 +81,9 @@ class SalesBookController extends Controller
 
         // Get the maximum invoice number for the company's purchases
         $latestInvoiceNumber = SalesBook::where('company_id', $compId)->max('dispatch_number');
-        $lastDigit = $this->getLastDigit($latestInvoiceNumber);
+        $lastNumber = $this->getLastNumber($latestInvoiceNumber);
         // Generate the next invoice number by incrementing the latest invoice or default to 1
-        $lastDigit = (int) $lastDigit; // Convert to integer
-        $nextInvoiceNumber = $lastDigit ? $lastDigit + 1 : 1;
+        $nextInvoiceNumber = $lastNumber ? $lastNumber + 1 : 1;
 
 
         // Format the invoice number to have 5 digits, with leading zeros if necessary
@@ -118,24 +114,18 @@ class SalesBookController extends Controller
 
     public function store(Request $request)
     {
-        // // Validate the request data
-        // $request->validate([
-        //     'date' => 'required',
-        //     'dispatch' => 'required|string|max:255',
-        //     'customer' => 'required|exists:users,id',
-        //     'weight' => 'required',
-        //     'transport' => 'required',
-        //     'vehicle_no' => 'required',
-        //     'other_expense' => 'required|numeric',
-        //     'discount' => 'required|numeric',
-        //     'round_off' => 'required|numeric',
-        //     'grand_total' => 'required|numeric',
-        //     'items.*' => 'required|exists:items,id',
-        //     'quantities.*' => 'required|numeric|min:0',
-        //     'rates.*' => 'required|numeric|min:0',
-        //     'taxes.*' => 'required|numeric|min:0',
-        //     'totalAmounts.*' => 'required|numeric|min:0',
-        // ]);
+        // Validate the request data
+        $request->validate([
+            'date' => 'required',
+            'dispatch' => 'required|string|max:255',
+            'customer' => 'required|exists:users,id',
+            'grand_total' => 'required|numeric',
+            'items' => 'required|array|min:1',
+            'quantities' => 'required|array|min:1',
+            'rates' => 'required|array|min:1',
+            'taxes' => 'required|array|min:1',
+            'totalAmounts' => 'required|array|min:1',
+        ]);
 
         // Start a database transaction
         DB::beginTransaction();
@@ -205,7 +195,7 @@ class SalesBookController extends Controller
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollback();
-            dd($e);
+            \Log::error('Sales Book Store Error: ' . $e->getMessage());
             // Redirect with an error message
             return redirect()->back()->with('error', 'An error occurred while saving the sales book entry.');
         }
@@ -223,11 +213,11 @@ class SalesBookController extends Controller
                     throw new \Exception('sales Book not found.');
                 }
 
-                // Loop through the items to update the stock
+                // Loop through the items to update the stock (add back to inventory since sale is being deleted)
                 foreach ($salesBook->salesbookitem as $item) {
                     $stockReport = StockReport::where('item_id', $item->item_id)->first();
                     if ($stockReport) {
-                        $stockReport->quantity -= $item->quantity;
+                        $stockReport->quantity += $item->quantity;
                         $stockReport->save();
                     }
                 }
@@ -334,11 +324,11 @@ class SalesBookController extends Controller
 
         $salesBook = SalesBook::with('salesbookitem')->find($id);
 
-        // Step 1: Subtract old quantities from StockReport
+        // Step 1: Add back old quantities to StockReport (reverse the previous sale)
         foreach ($salesBook->salesbookitem as $item) {
             $stockReport = StockReport::where('item_id', $item->item_id)->first();
             if ($stockReport) {
-                $stockReport->quantity -= $item->quantity;
+                $stockReport->quantity += $item->quantity;
                 $stockReport->save();
             }
         }
@@ -374,15 +364,15 @@ class SalesBookController extends Controller
 
             // Check if the item exists before updating or creating stock report entry
             if (Item::find($itemId)) {
-                // Update or create a StockReport entry
+                // Update or create a StockReport entry (subtract from stock for sale)
                 $stockReport = StockReport::where('item_id', $itemId)->first();
                 if ($stockReport) {
-                    $stockReport->quantity += $quantity;
+                    $stockReport->quantity -= $quantity;
                     $stockReport->save();
                 } else {
                     StockReport::create([
                         'item_id' => $itemId,
-                        'quantity' => $quantity,
+                        'quantity' => -$quantity,
                     ]);
                 }
 
@@ -456,10 +446,9 @@ class SalesBookController extends Controller
                     ->where('sales_book_id', $id)
                     ->first();
 
+                $newqty = $quantity;
                 if ($existingPurchesBookItem) {
-                    $newqty = $quantity;
                     $sreturn = $existingPurchesBookItem->sreturn + $newqty;
-
 
                     if ($existingPurchesBookItem->quantity == $existingPurchesBookItem->sreturn && $quantity > 0) {
                         return redirect()->back()->withInput()->withErrors([

@@ -65,7 +65,7 @@ class GstReportController extends Controller
                 // Modify query to filter by date range if start and end dates are provided
                 $query = SalesBook::where('customer_id', $userId);
                 if ($startDate && $endDate) {
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                    $query->whereBetween('date', [$startDate, $endDate]);
                 }
 
                 $salesBooks = $query->get();
@@ -87,7 +87,7 @@ class GstReportController extends Controller
                         $totals['salesBookItemInvoiceCount'] += 1;
 
                         $itemPrice = floatval($item->rate) * floatval($item->sreturn);
-                        $itemTaxValue = $itemPrice * (floatval($item->item->tax_rate ?? 0) / 100);
+                        $itemTaxValue = $itemPrice * (floatval($item->item->tax->rate ?? 0) / 100);
 
                         $totals['totalPrice'] += $itemPrice;
                         $totals['totalTaxValue'] += $itemTaxValue;
@@ -205,7 +205,7 @@ class GstReportController extends Controller
                 // Modify query to filter by date range if start and end dates are provided
                 $query = SalesBook::where('customer_id', $userId);
                 if ($startDate && $endDate) {
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                    $query->whereBetween('date', [$startDate, $endDate]);
                 }
 
                 $salesBooks = $query->get();
@@ -227,7 +227,7 @@ class GstReportController extends Controller
                         $totals['salesBookItemInvoiceCount'] += 1;
 
                         $itemPrice = floatval($item->rate) * floatval($item->sreturn);
-                        $itemTaxValue = $itemPrice * (floatval($item->item->tax_rate ?? 0) / 100);
+                        $itemTaxValue = $itemPrice * (floatval($item->item->tax->rate ?? 0) / 100);
 
                         $totals['totalPrice'] += $itemPrice;
                         $totals['totalTaxValue'] += $itemTaxValue;

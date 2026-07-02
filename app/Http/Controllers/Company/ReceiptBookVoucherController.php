@@ -12,16 +12,13 @@ use Exception;
 
 class ReceiptBookVoucherController extends Controller
 {
-    public function getLastDigit($str) {
-        // Use regular expression to find all digits in the string
-        preg_match_all('/\d/', $str, $matches);
-
-        // If there are digits found, return the last one
-        if (!empty($matches[0])) {
-            return end($matches[0]);
+    public function getLastNumber($str) {
+        // Use regular expression to find the trailing number in the string
+        if (preg_match('/(\d+)$/', $str, $matches)) {
+            return (int) $matches[1];
         }
 
-        // Return null or a message if no digits are found
+        // Return null if no digits are found
         return null;
     }
     /**
@@ -49,7 +46,7 @@ class ReceiptBookVoucherController extends Controller
         $compId = $user->company_id;
 
         // Fetch all purchase books for the user's company, including vendor details
-        $ReceiptBookVoucher = ReceiptBookVoucher::join('users', 'receipt_book_vouchers.customer_id', '=', 'users.id')
+        $ReceiptBookVoucher = ReceiptBookVoucher::leftJoin('users', 'receipt_book_vouchers.customer_id', '=', 'users.id')
             ->where('receipt_book_vouchers.company_id', $compId)
             ->select('receipt_book_vouchers.*', 'users.full_name as customer_name')
             ->orderByDesc('receipt_book_vouchers.id')
@@ -78,10 +75,9 @@ class ReceiptBookVoucherController extends Controller
 
         // Get the maximum invoice number for the company's purchases
         $latestRecieptNumber = ReceiptBookVoucher::where('company_id', $compId)->max('receipt_vouchers_number');
-        $lastDigit = $this->getLastDigit($latestRecieptNumber);
+        $lastNumber = $this->getLastNumber($latestRecieptNumber);
         // Generate the next invoice number by incrementing the latest invoice or default to 1
-        $lastDigit = (int) $lastDigit; // Convert to integer
-        $nextRecieptNumber = $lastDigit ? $lastDigit + 1 : 1;
+        $nextRecieptNumber = $lastNumber ? $lastNumber + 1 : 1;
 
 
         // Format the invoice number to have 5 digits, with leading zeros if necessary
@@ -116,6 +112,9 @@ class ReceiptBookVoucherController extends Controller
 
     public function store(Request $request)
     {
+        // Start a database transaction
+        DB::beginTransaction();
+
         try {
 
             // Define validation rules
@@ -153,7 +152,7 @@ class ReceiptBookVoucherController extends Controller
                 'payment_type' => $validatedData['payment_method'],
             ]);
 
-            // increment the stock quantity by 5
+            // increment the bank balance
             Bank::where('id', $validatedData['bank'])->increment('opening_blance', $validatedData['amount']);
 
 
@@ -165,9 +164,9 @@ class ReceiptBookVoucherController extends Controller
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollback();
-            dd($e);
+            \Log::error('Receipt Book Store Error: ' . $e->getMessage());
             // Redirect with an error message
-            return redirect()->back()->with('error', 'An error occurred while saving the sales book entry.');
+            return redirect()->back()->with('error', 'An error occurred while saving the receipt book entry.');
         }
     }
 
@@ -177,14 +176,19 @@ class ReceiptBookVoucherController extends Controller
     {
         try {
             DB::transaction(function () use ($id) {
-                // Find the sales book
+                // Find the receipt book
                 $ReceiptBook = ReceiptBookVoucher::find($id);
 
                 if (!$ReceiptBook) {
-                    throw new \Exception('sales Book not found.');
+                    throw new \Exception('Receipt Book not found.');
                 }
 
-                // Delete the sales book itself
+                // Reverse the bank balance that was incremented during store
+                if ($ReceiptBook->bank_id) {
+                    Bank::where('id', $ReceiptBook->bank_id)->decrement('opening_blance', $ReceiptBook->amount);
+                }
+
+                // Delete the receipt book itself
                 $ReceiptBook->delete();
             });
 
@@ -246,23 +250,24 @@ class ReceiptBookVoucherController extends Controller
             // Save the updated record
             $receiptBook->save();
 
-            Bank::where('id', $previousbank)->decrement('opening_blance', $request->amount);
+            // Reverse the previous bank balance using the PREVIOUS amount
+            Bank::where('id', $previousbank)->decrement('opening_blance', $previousamount);
 
-
+            // Apply the new bank balance using the NEW amount
             Bank::where('id', $request->bank)->increment('opening_blance', $request->amount);
 
             // Commit the transaction
             DB::commit();
 
             // Redirect with a success message
-            return redirect()->route('company.receipt.book.voucher.index')->with('success', 'receipt book entry saved successfully.');
+            return redirect()->route('company.receipt.book.voucher.index')->with('success', 'Receipt book entry updated successfully.');
         } catch (\Exception $e) {
-            dd($e);
             // Rollback the transaction on error
             DB::rollback();
+            \Log::error('Receipt Book Update Error: ' . $e->getMessage());
 
             // Redirect with an error message
-            return redirect()->back()->with('error', 'An error occurred while saving the sales book entry.');
+            return redirect()->back()->with('error', 'An error occurred while updating the receipt book entry.');
         }
     }
 

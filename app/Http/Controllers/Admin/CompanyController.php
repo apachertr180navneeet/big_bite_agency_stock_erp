@@ -203,7 +203,7 @@ class CompanyController extends Controller
 
         $user = Company::find($request->id);
         if ($user) {
-            $user->update($request->all());
+            $user->update($request->only(['name', 'email', 'phone', 'address', 'type', 'gstin', 'short_code']));
             return response()->json(['success' => true , 'message' => 'Company Update Successfully']);
         }
 

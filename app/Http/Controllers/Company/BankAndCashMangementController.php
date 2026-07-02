@@ -145,16 +145,31 @@ class BankAndCashMangementController extends Controller
             'withdraw_in' => 'required',
             'description' => 'required',
             'particular' => 'required',
-            'id' => 'required|integer|exists:bank_and_cashes,id', // Adjust as needed
+            'id' => 'required|integer|exists:bank_and_cashes,id',
         ]);
 
-        $user = BankAndCash::find($request->id);
-        if ($user) {
-            $user->update($request->all());
-            return response()->json(['success' => true, 'message' => 'User Update Successfully']);
+        $user = Auth::user();
+        $compId = $user->company_id;
+
+        $bankCash = BankAndCash::find($request->id);
+        if ($bankCash) {
+            // Reverse previous bank balances
+            $previousAmount = $bankCash->amount;
+            Bank::where('id', $bankCash->deposite_in)->where('company_id', $compId)->decrement('opening_blance', $previousAmount);
+            Bank::where('id', $bankCash->withdraw_in)->where('company_id', $compId)->increment('opening_blance', $previousAmount);
+
+            // Update the record
+            $bankCash->update($request->only(['date', 'serial_no', 'amount', 'deposite_in', 'withdraw_in', 'description', 'particular']));
+
+            // Apply new bank balances
+            $newAmount = $request->amount;
+            Bank::where('id', $request->deposite_in)->where('company_id', $compId)->increment('opening_blance', $newAmount);
+            Bank::where('id', $request->withdraw_in)->where('company_id', $compId)->decrement('opening_blance', $newAmount);
+
+            return response()->json(['success' => true, 'message' => 'Bank And Cash Updated Successfully']);
         }
 
-        return response()->json(['success' => false, 'message' => 'User not found']);
+        return response()->json(['success' => false, 'message' => 'Record not found']);
     }
 
     /**
@@ -166,6 +181,16 @@ class BankAndCashMangementController extends Controller
     public function destroy($id)
     {
         try {
+            $user = Auth::user();
+            $compId = $user->company_id;
+
+            $bankCash = BankAndCash::find($id);
+            if ($bankCash) {
+                // Reverse bank balances before deleting
+                Bank::where('id', $bankCash->deposite_in)->where('company_id', $compId)->decrement('opening_blance', $bankCash->amount);
+                Bank::where('id', $bankCash->withdraw_in)->where('company_id', $compId)->increment('opening_blance', $bankCash->amount);
+            }
+
             BankAndCash::where('id', $id)->delete();
 
             return response()->json([

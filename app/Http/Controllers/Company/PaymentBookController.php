@@ -31,17 +31,14 @@ class PaymentBookController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
 
-     public function getLastDigit($str)
+     public function getLastNumber($str)
     {
-        // Use regular expression to find all digits in the string
-        preg_match_all('/\d/', $str, $matches);
-
-        // If there are digits found, return the last one
-        if (!empty($matches[0])) {
-            return end($matches[0]);
+        // Use regular expression to find the trailing number in the string
+        if (preg_match('/(\d+)$/', $str, $matches)) {
+            return (int) $matches[1];
         }
 
-        // Return null or a message if no digits are found
+        // Return null if no digits are found
         return null;
     }
     public function getall(Request $request)
@@ -51,7 +48,7 @@ class PaymentBookController extends Controller
         $compId = $user->company_id;
 
         // Fetch all purchase books for the user's company, including vendor details
-        $ReceiptBookVoucher = PaymentBook::join('users', 'payment_books.vendor_id', '=', 'users.id')
+        $ReceiptBookVoucher = PaymentBook::leftJoin('users', 'payment_books.vendor_id', '=', 'users.id')
             ->where('payment_books.company_id', $compId)
             ->select('payment_books.*', 'users.full_name as vendor_name')
             ->orderByDesc('payment_books.id')
@@ -80,10 +77,9 @@ class PaymentBookController extends Controller
 
         // Get the maximum invoice number for the company's purchases
         $latestRecieptNumber = PaymentBook::where('company_id', $compId)->max('payment_vouchers_number');
-        $lastDigit = $this->getLastDigit($latestRecieptNumber);
+        $lastNumber = $this->getLastNumber($latestRecieptNumber);
         // Generate the next invoice number by incrementing the latest invoice or default to 1
-        $lastDigit = (int) $lastDigit; // Convert to integer
-        $nextRecieptNumber = $lastDigit ? $lastDigit + 1 : 1;
+        $nextRecieptNumber = $lastNumber ? $lastNumber + 1 : 1;
 
 
         // Format the invoice number to have 5 digits, with leading zeros if necessary
@@ -167,7 +163,7 @@ class PaymentBookController extends Controller
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollback();
-            dd($e);
+            \Log::error('Payment Book Store Error: ' . $e->getMessage());
 
             // Redirect with an error message
             return redirect()->back()->with('error', 'An error occurred while saving the payment book entry.');
@@ -180,15 +176,20 @@ class PaymentBookController extends Controller
     {
         try {
             DB::transaction(function () use ($id) {
-                // Find the sales book
-                $ReceiptBook = PaymentBook::find($id);
+                // Find the payment book
+                $PaymentBook = PaymentBook::find($id);
 
-                if (!$ReceiptBook) {
-                    throw new \Exception('sales Book not found.');
+                if (!$PaymentBook) {
+                    throw new \Exception('Payment Book not found.');
                 }
 
-                // Delete the sales book itself
-                $ReceiptBook->delete();
+                // Reverse the bank balance that was decremented during store
+                if ($PaymentBook->bank_id) {
+                    Bank::where('id', $PaymentBook->bank_id)->increment('opening_blance', $PaymentBook->amount);
+                }
+
+                // Delete the payment book itself
+                $PaymentBook->delete();
             });
 
             return response()->json(['success' => true]);
@@ -250,23 +251,24 @@ class PaymentBookController extends Controller
             // Save the updated record
             $receiptBook->save();
 
-            Bank::where('id', $previousbank)->increment('opening_blance', $request->amount);
+            // Reverse the previous bank balance using the PREVIOUS amount
+            Bank::where('id', $previousbank)->increment('opening_blance', $previousamount);
 
-
+            // Apply the new bank balance using the NEW amount
             Bank::where('id', $request->bank)->decrement('opening_blance', $request->amount);
 
             // Commit the transaction
             DB::commit();
 
             // Redirect with a success message
-            return redirect()->route('company.payment.book.index')->with('success', 'Payment book entry saved successfully.');
+            return redirect()->route('company.payment.book.index')->with('success', 'Payment book entry updated successfully.');
         } catch (\Exception $e) {
-            dd($e);
             // Rollback the transaction on error
             DB::rollback();
+            \Log::error('Payment Book Update Error: ' . $e->getMessage());
 
             // Redirect with an error message
-            return redirect()->back()->with('error', 'An error occurred while saving the sales book entry.');
+            return redirect()->back()->with('error', 'An error occurred while updating the payment book entry.');
         }
     }
 
