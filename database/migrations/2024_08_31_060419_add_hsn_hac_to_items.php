@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->string('hsn_hac')->nullable(); // Add your column here
-        });
+        if (!Schema::hasColumn('items', 'hsn_hac')) {
+            Schema::table('items', function (Blueprint $table) {
+                $table->string('hsn_hac')->nullable(); // Add your column here
+            });
+        }
     }
 
     /**
