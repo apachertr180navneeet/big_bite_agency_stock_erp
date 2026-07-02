@@ -29,10 +29,7 @@ use App\Http\Controllers\Company\{
     GstReportController,
     SubcompanyController
 };
-use App\Http\Controllers\PagarBook\{
-    PagarBookAuthController,
-    EmployeeController
-};
+
 use App\Http\Controllers\Ajax\{
     LocationController
 };
@@ -127,58 +124,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| Pagar Book Routes
-|--------------------------------------------------------------------------
-|
-| Routes for admin functionalities, prefixed with 'admin' and named with 'admin.'
-|
-*/
 
-Route::prefix('pagar-book')->name('pagar.book.')->group(function () {
-
-    // Admin Authentication Routes
-    Route::controller(PagarBookAuthController::class)->group(function () {
-        Route::get('login', 'login')->name('login');
-        Route::post('login', 'postLogin')->name('login.post');
-        Route::get('forget-password', 'showForgetPasswordForm')->name('forget.password.get');
-        Route::post('forget-password', 'submitForgetPasswordForm')->name('forget.password.post');
-        Route::get('reset-password/{token}', 'showResetPasswordForm')->name('reset.password.get');
-        Route::post('reset-password', 'submitResetPasswordForm')->name('reset.password.post');
-    });
-
-    // Routes requiring 'pagar_book' middleware
-    Route::middleware('pagar_book')->group(function () {
-
-        // Admin Dashboard and Profile Routes
-        Route::controller(PagarBookAuthController::class)->group(function () {
-            Route::get('dashboard', 'companyDashboard')->name('dashboard');
-            Route::get('change-password', 'changePassword')->name('change.password');
-            Route::post('update-password', 'updatePassword')->name('update.password');
-            Route::get('logout', 'logout')->name('logout');
-            Route::get('profile', 'adminProfile')->name('profile');
-            Route::post('profile', 'updateAdminProfile')->name('update.profile');
-        });
-
-        // Employee Management Routes
-        Route::prefix('employee')->name('employee.')->controller(EmployeeController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('all', 'getall')->name('getall');
-            Route::post('store', 'store')->name('store');
-            Route::post('status', 'status')->name('status');
-            Route::delete('delete/{id}', 'destroy')->name('destroy');
-            Route::get('get/{id}', 'get')->name('get');
-            Route::post('update', 'update')->name('update');
-            Route::get('getaddvance/{id}', 'getAdvance')->name('get.advance');
-            Route::post('advncestore', 'advncestore')->name('advncestore');
-            Route::get('getsalary/{id}', 'getSalary')->name('get.salary');
-            Route::post('salarystore', 'salarystore')->name('salarystore');
-             Route::get('getlager/{id}', 'getLager')->name('get.lager');
-        });
-
-    });
-});
 
 /*
 |--------------------------------------------------------------------------
