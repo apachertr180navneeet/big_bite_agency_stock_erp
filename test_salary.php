@@ -1,0 +1,1 @@
+<?php $data = ['user_id' => 1, 'slarly_mounth' => 'July 2026', 'total_working_day' => '30', 'total_present_day' => '25', 'diduction_amount' => 500, 'diduction_amountfromadvance' => 0, 'amount' => 10000, 'salary_to' => '2026-07-01', 'insentive_point' => 100, 'pay_date' => '2026-07-02']; print_r(\App\Models\EmpSalary::create($data));

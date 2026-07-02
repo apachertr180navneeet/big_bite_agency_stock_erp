@@ -65,9 +65,7 @@ class PagarBookAuthController extends Controller
                 if(Auth::attempt([
                         'email' => $request->email,
                         'password' => $request->password,
-                        'role' => function ($query) {
-                            $query->where('role','pagar_book');
-                        }
+                        'role' => 'pagar_book'
                     ]))
                 {
                     $user = auth()->user();
@@ -80,7 +78,7 @@ class PagarBookAuthController extends Controller
                     // }
 
                 }
-                return back()->with("error","Invalid credentials 123");
+                return back()->with("error","Invalid credentials");
             }else{
                 return back()->with("error","Invalid credentials");
             }

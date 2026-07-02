@@ -158,14 +158,21 @@
                 success: function(response) {
                     console.log(response);
                     if (response.success) {
-                       
-                        location.reload();
+                        setFlash('success', response.message);
+                        setTimeout(function(){ location.reload(); }, 1500);
                     } else {
-                        location.reload();
+                        if (response.errors) {
+                            $.each(response.errors, function(key, val) {
+                                $('#' + key).siblings('.error-text').text(val[0]);
+                            });
+                        } else {
+                            setFlash('error', response.message || 'Something went wrong!');
+                        }
                     }
                 },
                 error: function(xhr) {
-                    location.reload();
+                    setFlash('error', 'Server Error');
+                    console.log(xhr.responseText);
                 }
             });
         });

@@ -1,0 +1,1 @@
+<?php use Illuminate\Support\Facades\DB; DB::statement('ALTER TABLE emp_salary MODIFY salary_to VARCHAR(255) NULL'); DB::statement('ALTER TABLE emp_salary MODIFY pay_date VARCHAR(255) NULL'); echo 'Columns updated successfully.';

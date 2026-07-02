@@ -123,6 +123,8 @@ class EmployeeController extends Controller
         $dataUser = [
             'full_name' => $request->name,
             'phone' => $request->phone,
+            'email' => $request->phone . '@employee.com', // dummy email to satisfy DB constraint
+            'password' => \Illuminate\Support\Facades\Hash::make($request->phone), // default password
             'date_of_joing' => $request->doj,
             'base_salary' => $request->base_salary,
             'role' => 'employee',
@@ -311,13 +313,12 @@ class EmployeeController extends Controller
 
         } catch (\Exception $e) {
             // Log error
-            dd($e   );
+            \Log::error('Salary Creation Error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong. Please try again!',
-                'error' => $e->getMessage(), // Optional: Hide in production
-            ], 500);
+                'message' => 'Error: ' . $e->getMessage(),
+            ]);
         }
     }
 
