@@ -44,7 +44,7 @@ class VendorController extends Controller
 
         $compId = $user->company_id;
 
-        $items = User::join('sub_company', 'users.sub_compnay_id', '=', 'sub_company.id')
+        $items = User::join('sub_company', 'users.sub_company_id', '=', 'sub_company.id')
         ->where('users.role', 'vendor')
         ->where('users.company_id', $compId)->select('users.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
         ->orderBy('users.id', 'desc')
@@ -102,7 +102,7 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Validation rules
         $rules = [
-            'sub_compnay_id' => 'required',
+            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => [
                 'nullable',
@@ -148,7 +148,7 @@ class VendorController extends Controller
         $compId = $user->company_id;
         // Save the User data
         $dataUser = [
-            'sub_compnay_id' => $request->sub_compnay_id,
+            'sub_company_id' => $request->sub_company_id,
             'full_name' => $request->full_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -200,7 +200,7 @@ class VendorController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'sub_compnay_id' => 'required',
+            'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
             'phone' => 'nullable|string|max:20',

@@ -48,7 +48,7 @@ class ItemController extends Controller
         $compId = $user->company_id;
 
         $items = Item::join('variations', 'items.variation_id', '=', 'variations.id')
-        ->join('sub_company','items.sub_compnay_id','=','sub_company.id')
+        ->join('sub_company','items.sub_company_id','=','sub_company.id')
         ->where('items.company_id',$compId)
         ->select('items.*', 'variations.name as variation_name' , 'sub_company.name as sub_company_name')
         ->get();
@@ -128,7 +128,7 @@ class ItemController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'variation_id' => $request->variation_id,
-            'sub_compnay_id' => $request->sub_comapny,
+            'sub_company_id' => $request->sub_comapny,
             'tax_id' => $request->tax_id,
             'hsn_hac' => $request->hsn_hac,
             'opening_stock' => $request->opening_stock,
@@ -155,7 +155,7 @@ class ItemController extends Controller
         $stockReport = StockReport::where('item_id', $id)->first();
 
         // Retrieve cities based on state id
-        $categories = Variation::where('sub_compnay_id', $user->sub_compnay_id)->get(['id', 'name']);
+        $categories = Variation::where('sub_company_id', $user->sub_company_id)->get(['id', 'name']);
 
         $user->quantity = $stockReport->quantity;
         return response()->json([
@@ -170,7 +170,7 @@ class ItemController extends Controller
         $request->validate([
             'name' => 'required|string',
             'variation_id' => 'required',
-            'sub_compnay_id' => 'required',
+            'sub_company_id' => 'required',
             'id' => 'required|integer|exists:items,id', // Adjust as needed
             'hsn_hac' => 'required',
         ]);

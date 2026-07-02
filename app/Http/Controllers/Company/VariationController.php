@@ -38,7 +38,7 @@ class VariationController extends Controller
 
         $compId = $user->company_id;
 
-        $variations = Variation::join('sub_company', 'variations.sub_compnay_id', '=', 'sub_company.id')
+        $variations = Variation::join('sub_company', 'variations.sub_company_id', '=', 'sub_company.id')
         ->where('variations.company_id', $compId)
         ->select('variations.*', 'sub_company.name as sub_company_name') // Adjust the select fields as needed
         ->orderBy('variations.id', 'desc')
@@ -114,7 +114,7 @@ class VariationController extends Controller
             'name' => $request->name,
             'code' => $request->code,
             'company_id' => $compId,
-            'sub_compnay_id' => $request->sub_company
+            'sub_company_id' => $request->sub_company
         ];
         Variation::create($dataUser);
 

@@ -53,7 +53,7 @@ class SalesBookController extends Controller
 
         // Fetch all sales books for the user's company, including vendor details
         $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
-            ->join('sub_company', 'sales_books.sub_compnay_id', '=', 'sub_company.id')
+            ->join('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '0')
             ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
@@ -151,7 +151,7 @@ class SalesBookController extends Controller
                 'company_id' => $compId,
                 'dispatch_number' => $request->dispatch,
                 'customer_id' => $request->customer,
-                'sub_compnay_id' => $request->sub_compnay_id,
+                'sub_company_id' => $request->sub_company_id,
                 'payment_type' => $request->payment_type,
                 'item_weight' => $request->weight,
                 'transport' => $request->transport,
@@ -282,7 +282,7 @@ class SalesBookController extends Controller
 
         $salesBook = SalesBook::with('salesbookitem.item.variation')->find($id);
 
-        $subCompany = SubCompany::find($salesBook->sub_compnay_id);
+        $subCompany = SubCompany::find($salesBook->sub_company_id);
 
 
         // Fetch all active vendors for the user's company
@@ -528,7 +528,7 @@ class SalesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
-            ->join('sub_company', 'sales_books.sub_compnay_id', '=', 'sub_company.id')
+            ->join('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '1')
             ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')

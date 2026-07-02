@@ -76,13 +76,13 @@ class LocationController extends Controller
     // Manage to get category by sub company
     public function getCategory($sub_company)
     {
-        $categories = Variation::where('sub_compnay_id', $sub_company)->get(['id', 'name']);
+        $categories = Variation::where('sub_company_id', $sub_company)->get(['id', 'name']);
         return response()->json($categories);
     }
 
     public function getVendors($sub_company_id)
     {
-        $vendors = User::where('sub_compnay_id', $sub_company_id)->where('role', 'vendor')->where('status', 'active')->get();
+        $vendors = User::where('sub_company_id', $sub_company_id)->where('role', 'vendor')->where('status', 'active')->get();
 
         return response()->json($vendors);
     }
@@ -90,7 +90,7 @@ class LocationController extends Controller
 
     public function getCategories($sub_company_id)
     {
-        $categories = Variation::where('sub_compnay_id', $sub_company_id)->where('status', 'active')->get();
+        $categories = Variation::where('sub_company_id', $sub_company_id)->where('status', 'active')->get();
 
         return response()->json($categories);
     }
@@ -103,7 +103,7 @@ class LocationController extends Controller
 
     public function getCustomers($sub_company_id)
     {
-        $customers = User::where('sub_compnay_id', $sub_company_id)->where('role', 'customer')->where('status', 'active')->get();
+        $customers = User::where('sub_company_id', $sub_company_id)->where('role', 'customer')->where('status', 'active')->get();
 
         return response()->json($customers);
     }

@@ -14,6 +14,7 @@ class DummyDataSeeder extends Seeder
     {
         // Generate core dummy data using factories
         \App\Models\Company::factory(5)->create();
+        \App\Models\SubCompany::factory(5)->create();
         \App\Models\Tax::factory(10)->create();
         \App\Models\Variation::factory(10)->create();
         \App\Models\Item::factory(20)->create();

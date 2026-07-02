@@ -84,7 +84,7 @@ class PurchesReportController extends Controller
             ->select('purches_books.*', 'users.full_name as vendor_name', 'users.address as vendor_address', 'users.city as vendor_city', 'users.state as vendor_state', 'users.gst_no as vendor_gst_no', 'users.phone as vendor_phone')
             ->find($id);
 
-        $subCompany = SubCompany::find($purchaseReport->sub_compnay_id);
+        $subCompany = SubCompany::find($purchaseReport->sub_company_id);
 
         $bank = Bank::where('company_id', $compId)->where('show_invoice', '1')->first();
 

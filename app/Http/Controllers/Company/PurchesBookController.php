@@ -51,7 +51,7 @@ class PurchesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
-            ->join('sub_company', 'purches_books.sub_compnay_id', '=', 'sub_company.id')
+            ->join('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
             ->where('purches_books.purches_return', '0')
             ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
@@ -127,7 +127,7 @@ class PurchesBookController extends Controller
             $purchesBook = PurchesBook::create([
                 'date' => $request->date,
                 'company_id' => $compId,
-                'sub_compnay_id' => $request->sub_compnay_id,
+                'sub_company_id' => $request->sub_company_id,
                 'invoice_number' => $request->invoice,
                 'vendor_id' => $request->vendor,
                 'transports' => $request->transport,
@@ -282,7 +282,7 @@ class PurchesBookController extends Controller
         
 
 
-        $subCompany = SubCompany::find($purchaseBook->sub_compnay_id);
+        $subCompany = SubCompany::find($purchaseBook->sub_company_id);
 
 
         // Fetch all active vendors for the user's company
@@ -537,7 +537,7 @@ class PurchesBookController extends Controller
 
         // Fetch all purchase books for the user's company, including vendor details
         $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
-            ->join('sub_company', 'purches_books.sub_compnay_id', '=', 'sub_company.id')
+            ->join('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
             ->where('purches_books.purches_return', '1')
             ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
