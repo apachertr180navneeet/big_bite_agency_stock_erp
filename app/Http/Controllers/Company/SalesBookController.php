@@ -171,6 +171,7 @@ class SalesBookController extends Controller
                     'tax' => $request->taxes[$index],
                     'cess' => $request->cess[$index],
                     'amount' => $request->totalAmounts[$index],
+                    'sreturn' => 0,
                 ]);
 
                 $quantity = $request->quantities[$index];
@@ -182,7 +183,7 @@ class SalesBookController extends Controller
                 } else {
                     StockReport::create([
                         'item_id' => $itemId,
-                        'quantity' => $quantity,
+                        'quantity' => -$quantity,
                     ]);
                 }
             }

@@ -93,18 +93,9 @@ class PaymentBookController extends Controller
             ->get();
 
 
-        $purchasebooks = collect(); // Create an empty collection to store sales books
-
-        foreach ($vendors as $vendor) {
-            $customerPurchaseBooks = PurchesBook::where('vendor_id', $vendor->id)->get();
-            $purchasebooks = $purchasebooks->merge($customerPurchaseBooks); // Add the sales books to the collection
-        }
-
-        $paymentAmounts = collect();
-        foreach ($vendors as $vendor) {
-            $customerReciept = PaymentBook::where('vendor_id', $vendor->id)->get();
-            $paymentAmounts = $paymentAmounts->merge($customerReciept); // Add the sales books to the collection
-        }
+        $vendorIds = $vendors->pluck('id');
+        $purchasebooks = PurchesBook::whereIn('vendor_id', $vendorIds)->get();
+        $paymentAmounts = PaymentBook::whereIn('vendor_id', $vendorIds)->get();
 
         // dd($salesbooks);
         $banks = Bank::where('company_id',$compId)->get();

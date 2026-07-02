@@ -151,7 +151,7 @@ class PurchesBookController extends Controller
                     'category' => $request->categorys[$index],
                     'item_id' => $itemId,
                     'quantity' => $request->quantities[$index],
-                    'preturn' => $request->quantities[$index],
+                    'preturn' => 0,
                     'rate' => $request->rates[$index],
                     'tax' => $request->taxes[$index],
                     'cess' => $request->cess[$index],

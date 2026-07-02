@@ -28,4 +28,19 @@ class PurchesBook extends Model
         return $this->hasMany(PurchesBookItem::class, 'purches_book_id');
     }
 
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    public function transport_details()
+    {
+        return $this->belongsTo(Transport::class, 'transport');
+    }
+
+    public function subCompany()
+    {
+        return $this->belongsTo(SubCompany::class, 'sub_company_id');
+    }
+
 }

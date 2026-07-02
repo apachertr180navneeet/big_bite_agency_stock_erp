@@ -21,4 +21,14 @@ class ReceiptBookVoucher extends Model
     protected $fillable = [
         'date', 'receipt_vouchers_number', 'customer_id', 'company_id', 'amount', 'discount', 'round_off', 'grand_total' , 'status','remark','bank_id','payment_type' // Add all the attributes you want to be mass assignable
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class, 'bank_id');
+    }
 }

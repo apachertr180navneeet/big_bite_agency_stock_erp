@@ -89,18 +89,9 @@ class ReceiptBookVoucherController extends Controller
             ->where('company_id', $compId)
             ->where('status', 'active')
             ->get();
-        $salesbooks = collect(); // Create an empty collection to store sales books
-
-        foreach ($customers as $customer) {
-            $customerSalesbooks = SalesBook::where('customer_id', $customer->id)->get();
-            $salesbooks = $salesbooks->merge($customerSalesbooks); // Add the sales books to the collection
-        }
-
-        $recieptAmounts = collect();
-        foreach ($customers as $customer) {
-            $customerReciept = ReceiptBookVoucher::where('customer_id', $customer->id)->get();
-            $recieptAmounts = $recieptAmounts->merge($customerReciept); // Add the sales books to the collection
-        }
+        $customerIds = $customers->pluck('id');
+        $salesbooks = SalesBook::whereIn('customer_id', $customerIds)->get();
+        $recieptAmounts = ReceiptBookVoucher::whereIn('customer_id', $customerIds)->get();
 
         // dd($salesbooks);
         $banks = Bank::where('company_id', $compId)->get();

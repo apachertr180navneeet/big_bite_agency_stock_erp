@@ -28,4 +28,19 @@ class SalesBook extends Model
     {
         return $this->hasMany(SalesBookItem::class, 'sales_book_id');
     }
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function transport_details()
+    {
+        return $this->belongsTo(Transport::class, 'transport');
+    }
+
+    public function subCompany()
+    {
+        return $this->belongsTo(SubCompany::class, 'sub_company_id');
+    }
 }
