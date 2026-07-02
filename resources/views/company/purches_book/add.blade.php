@@ -45,15 +45,15 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="sub_compnay_id" class="form-label">Sub Comapny</label>
-                                    <select class="form-select" id="sub_compnay_id" name="sub_compnay_id" required>
+                                    <label for="sub_company_id" class="form-label">Sub Company</label>
+                                    <select class="form-select" id="sub_company_id" name="sub_company_id" required>
                                         <option value="">Select</option>
                                         @foreach ($subComapnys as $subComapny)
                                             <option value="{{ $subComapny->id }}"
-                                                {{ old('sub_compnay_id') == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
+                                                {{ old('sub_company_id') == $subComapny->id ? 'selected' : '' }}>{{ $subComapny->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('sub_compnay_id')
+                                    @error('sub_company_id')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -537,7 +537,7 @@
     
         $(document).ready(function () {
             // **AJAX: Get Vendors by Sub Company**
-            $('#sub_compnay_id').on('change', function () {
+            $('#sub_company_id').on('change', function () {
                 let subCompanyId = $(this).val();
                 let vendorDropdown = $('#vendor');
                 let categoryDropdown = $('#category');

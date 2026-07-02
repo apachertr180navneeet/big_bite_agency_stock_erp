@@ -283,7 +283,7 @@
                     $('#compid').val(user.id);
                     $('#editname').val(user.name);
                     $('#editdescription').val(user.description);
-                    $('#edit_sub_comapny').val(user.sub_compnay_id);
+                    $('#edit_sub_comapny').val(user.sub_company_id);
                     $('#edit_variation_id').val(user.variation_id);
                     $('#edithsn_hac').val(user.hsn_hac);
                     $('#edittax_id').val(user.tax_id);
@@ -319,7 +319,7 @@
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(),
                     description: $('#editdescription').val(),
-                    sub_compnay_id: $('#edit_sub_comapny').val(),
+                    sub_company_id: $('#edit_sub_comapny').val(),
                     variation_id: $('#edit_variation_id').val(),
                     hsn_hac: $('#edithsn_hac').val(),
                     tax_id: $('#edittax_id').val(),

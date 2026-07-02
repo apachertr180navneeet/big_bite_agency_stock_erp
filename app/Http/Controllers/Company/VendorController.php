@@ -104,25 +104,9 @@ class VendorController extends Controller
         $rules = [
             'sub_company_id' => 'required',
             'full_name' => 'required|string|max:255',
-            'email' => [
-                'nullable',
-                'email',
-                'max:255',
-                // Rule::unique('users')->where(function ($query) use ($request) {
-                //     return $query->where('role', $request->role);
-                // }),
-            ],
-            'phone' => [
-                'nullable',
-                'string',
-                'max:20',
-                // Rule::unique('users')->where(function ($query) use ($request) {
-                //     return $query->where('role', $request->role);
-                // }),
-            ],
+            'email' => 'nullable|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20|unique:users,phone',
             'address' => 'required|string',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string',
             'gst' => 'nullable|string',
         ];
 
@@ -153,9 +137,6 @@ class VendorController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
-            'state' => $request->state,
-            'zipcode' => $request->zipcode,
-            'city' => $request->city,
             'role' => 'vendor',
             'gst_no' =>  $request->gst,
             'company_id' => $compId,
@@ -205,8 +186,6 @@ class VendorController extends Controller
             'email' => 'nullable|email|max:255|unique:users,email,' . $request->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string',
             'gst_no' => 'nullable|string',
             'id' => 'required|integer|exists:users,id', // Adjust as needed
         ]);

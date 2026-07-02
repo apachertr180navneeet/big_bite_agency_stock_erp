@@ -48,8 +48,8 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label for="sub_compnay_id" class="form-label">Sub Company</label>
-                        <select class="form-select" id="sub_compnay_id">
+                        <label for="sub_company_id" class="form-label">Sub Company</label>
+                        <select class="form-select" id="sub_company_id">
                             <option value="">Select  Sub Company</option>
                             @foreach ($subcompany as $subcomp)
                                 <option value="{{$subcomp->id}}">{{$subcomp->name}}</option>
@@ -77,30 +77,7 @@
                         <textarea class="form-control" id="address"name="address" rows="3"></textarea>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="state">
-                            <option value="">Select  State</option>
-                            @foreach ($states as $state)
-                                <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select class="form-select" id="city">
-                            <option value="">Select  City</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="zipcode" class="form-label">Pincode</label>
-                        <select class="form-select" id="zipcode">
-                            <option value="">Select  Pincode</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+
                     <div class="col-md-12 mb-3">
                         <label for="gst" class="form-label">GST No.</label>
                         <input type="text" id="gst" class="form-control" placeholder="" />
@@ -160,30 +137,7 @@
                         <textarea class="form-control" id="editaddress"name="editaddress" rows="3"></textarea>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="editstate">
-                            <option selected>Select  State</option>
-                            @foreach ($states as $state)
-                                <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select class="form-select" id="editcity">
-                            <option selected>Select  City</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="zipcode" class="form-label">Pincode</label>
-                        <select class="form-select" id="editzipcode">
-                            <option selected>Select  Pincode</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
+
                     <div class="col-md-12 mb-3">
                         <label for="gst" class="form-label">GST No.</label>
                         <input type="text" id="editgst" class="form-control" placeholder="" />
@@ -260,15 +214,11 @@
             // Collect form data
             let data = {
                 full_name: $('#full_name').val(),
-                sub_compnay_id:$('#sub_compnay_id').val(),
+                sub_company_id:$('#sub_company_id').val(),
                 email: $('#email').val(),
                 phone: $('#phone').val(),
                 address: $('#address').val(),
-                city: $('#city').val(),
-                state: $('#state').val(),
                 role: $('#role').val(),
-                zipcode: $('#zipcode').val(),
-                address: $('#address').val(),
                 gst: $('#gst').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
@@ -315,8 +265,6 @@
                 method: 'GET',
                 success: function(data) {
                     const user = data.user;
-                    const cities = data.cities;
-                    const pincodes = data.pincodes;
 
 
                     // Populate modal fields with the retrieved data
@@ -324,24 +272,11 @@
                     $('#editname').val(user.full_name);
                     $('#editemail').val(user.email);
                     $('#editphone').val(user.phone);
-                    $('#editcity').val(user.city);
-                    $('#editstate').val(user.state);
                     $('#editgst').val(user.gst_no);
-                    $('#editzipcode').val(user.zipcode);
                     $('#editaddress').val(user.address);
-                    $('#edit_sub_company').val(user.sub_compnay_id);
+                    $('#edit_sub_company').val(user.sub_company_id);
 
-                    // Populate city dropdown
-                    $('#editcity').empty().append('<option selected>Select City</option>');
-                    cities.forEach(city => {
-                        $('#editcity').append(`<option value="${city.city_name}" ${user.city === city.city_name ? 'selected' : ''}>${city.city_name}</option>`);
-                    });
 
-                    // Populate pincode dropdown
-                    $('#editzipcode').empty().append('<option selected>Select Pincode</option>');
-                    pincodes.forEach(pincode => {
-                        $('#editzipcode').append(`<option value="${pincode.pincode}" ${user.zipcode === pincode.pincode ? 'selected' : ''}>${pincode.pincode}</option>`);
-                    });
 
                     // Open the modal
                     $('#editModal').modal('show');
@@ -361,15 +296,11 @@
                 method: 'POST',
                 data: {
                     full_name: $('#editname').val(),
-                    sub_compnay_id:$('#edit_sub_company').val(),
+                    sub_company_id:$('#edit_sub_company').val(),
                     email: $('#editemail').val(),
                     phone: $('#editphone').val(),
                     address: $('#editaddress').val(),
-                    city: $('#editcity').val(),
-                    state: $('#editstate').val(),
-                    zipcode: $('#editzipcode').val(),
                     gst_no: $('#editgst').val(),
-                    address: $('#editaddress').val(),
                     _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
                     id: userId // Ensure userId is in scope or adjust accordingly
                 },
@@ -473,67 +404,5 @@
         window.deleteUser = deleteUser;
         window.editUser = editUser;
     });
-
-    // Event handling for dynamic state and city selection
-    $(document).ready(function () {
-        // Trigger when state is changed in the 'Add Vendor' modal
-        $('#state').on('change', function () {
-            let stateId = $('#state').find(':selected').attr('data-id');
-            fetchCities(stateId, $('#city')); // Fetch cities based on selected state
-        });
-
-        // Trigger when city is changed in the 'Add Vendor' modal
-        $('#city').on('change', function () {
-            let cityId = $('#city').find(':selected').attr('data-id');
-            fetchPincodes(cityId, $('#zipcode')); // Fetch pincodes based on selected city
-        });
-
-        // Trigger when state is changed in the 'Edit Vendor' modal
-        $('#editstate').on('change', function () {
-            let stateId = $('#editstate').find(':selected').attr('data-id');
-            fetchCities(stateId, $('#editcity')); // Fetch cities based on selected state
-        });
-
-        // Trigger when city is changed in the 'Edit Vendor' modal
-        $('#editcity').on('change', function () {
-            let cityId = $('#editcity').find(':selected').attr('data-id');
-            fetchPincodes(cityId, $('#editzipcode')); // Fetch pincodes based on selected city
-        });
-
-        // Function to fetch cities based on stateId
-        function fetchCities(stateId, cityElement) {
-            if (stateId) {
-                $.ajax({
-                    url: '{{ route("ajax.getCities", "") }}/' + stateId, // Fetch cities based on state ID
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        cityElement.empty().append('<option selected>Select City</option>');
-                        $.each(data, function (key, value) {
-                            cityElement.append('<option value="' + value.city_name + '" data-id="' + value.id + '">' + value.city_name + '</option>');
-                        });
-                    }
-                });
-            }
-        }
-
-        // Function to fetch pincodes based on cityId
-        function fetchPincodes(cityId, zipcodeElement) {
-            if (cityId) {
-                $.ajax({
-                    url: '{{ route("ajax.getPincodes", "") }}/' + cityId, // Fetch pincodes based on city ID
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (datapincode) {
-                        zipcodeElement.empty().append('<option selected>Select Pincode</option>');
-                        $.each(datapincode, function (keypincode, valuepincode) {
-                            zipcodeElement.append('<option value="' + valuepincode.pincode + '">' + valuepincode.pincode + '</option>');
-                        });
-                    }
-                });
-            }
-        }
-    });
-
 </script>
 @endsection

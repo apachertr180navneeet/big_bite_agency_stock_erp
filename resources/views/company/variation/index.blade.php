@@ -199,7 +199,7 @@
                 success: function(data) {
                     $('#compid').val(data.id);
                     $('#editname').val(data.name);
-                    $('#edit_sub_company').val(data.sub_compnay_id);
+                    $('#edit_sub_company').val(data.sub_company_id);
 
                     $('#editModal').modal('show');
                     setFlash("success", 'Variation found successfully.');
@@ -219,7 +219,7 @@
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     name: $('#editname').val(), // Ensure consistency in field names
-                    sub_compnay_id: $('#edit_sub_company').val(), // Ensure consistency in field names
+                    sub_company_id: $('#edit_sub_company').val(), // Ensure consistency in field names
                     id: userId
                 },
                 success: function(response) {

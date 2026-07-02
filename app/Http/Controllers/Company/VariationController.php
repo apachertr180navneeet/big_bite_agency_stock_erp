@@ -112,7 +112,7 @@ class VariationController extends Controller
         // Save the User data
         $dataUser = [
             'name' => $request->name,
-            'code' => $request->code,
+            'code' => $request->code ?? (string) rand(100000, 999999),
             'company_id' => $compId,
             'sub_company_id' => $request->sub_company
         ];

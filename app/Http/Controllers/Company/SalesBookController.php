@@ -52,8 +52,8 @@ class SalesBookController extends Controller
         $compId = $user->company_id;
 
         // Fetch all sales books for the user's company, including vendor details
-        $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
-            ->join('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
+        $salesBooks = SalesBook::leftJoin('users', 'sales_books.customer_id', '=', 'users.id')
+            ->leftJoin('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '0')
             ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')
@@ -272,7 +272,12 @@ class SalesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.sales_book.edit', compact('salesBook', 'customers', 'items', 'companyState'));
+        $subComapnys = SubCompany::where([
+            ['company_id', $compId],
+            ['status', 'active']
+        ])->get();
+
+        return view('company.sales_book.edit', compact('salesBook', 'customers', 'items', 'companyState', 'subComapnys'));
     }
     public function view($id)
     {
@@ -342,6 +347,7 @@ class SalesBookController extends Controller
         $salesBook->date = $request->date;
         $salesBook->dispatch_number = $request->dispatch;
         $salesBook->customer_id = $request->customer;
+        $salesBook->sub_company_id = $request->sub_company_id;
         $salesBook->item_weight = $request->weight;
         $salesBook->transport = $request->transport;
         $salesBook->vehicle_no = $request->vehicle_no;
@@ -478,12 +484,11 @@ class SalesBookController extends Controller
                 );
                 // }
 
-                $stkqty = $existingPurchesBookItem->quantity - $sreturn;
                 // Update stock report
                 $stockReport = StockReport::where('item_id', $itemId)->first();
 
                 if ($stockReport) {
-                    $stockReport->increment('quantity', $stkqty);
+                    $stockReport->increment('quantity', $newqty);
                 }
             }
             // Update the PurchesBook with the calculated grand total
@@ -527,8 +532,8 @@ class SalesBookController extends Controller
         $compId = $user->company_id;
 
         // Fetch all purchase books for the user's company, including vendor details
-        $salesBooks = SalesBook::join('users', 'sales_books.customer_id', '=', 'users.id')
-            ->join('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
+        $salesBooks = SalesBook::leftJoin('users', 'sales_books.customer_id', '=', 'users.id')
+            ->leftJoin('sub_company', 'sales_books.sub_company_id', '=', 'sub_company.id')
             ->where('sales_books.company_id', $compId)
             ->where('sales_books.sales_return', '1')
             ->select('sales_books.*', 'users.full_name as customer_name', 'sub_company.name as sub_company_name')

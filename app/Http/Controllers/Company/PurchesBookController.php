@@ -50,10 +50,9 @@ class PurchesBookController extends Controller
         $compId = $user->company_id;
 
         // Fetch all purchase books for the user's company, including vendor details
-        $purchesBooks = PurchesBook::join('users', 'purches_books.vendor_id', '=', 'users.id')
-            ->join('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
+        $purchesBooks = PurchesBook::leftJoin('users', 'purches_books.vendor_id', '=', 'users.id')
+            ->leftJoin('sub_company', 'purches_books.sub_company_id', '=', 'sub_company.id')
             ->where('purches_books.company_id', $compId)
-            ->where('purches_books.purches_return', '0')
             ->select('purches_books.*', 'users.full_name as vendor_name' , 'sub_company.name as sub_company_name')
             ->orderByDesc('purches_books.id')
             ->get();
@@ -130,7 +129,7 @@ class PurchesBookController extends Controller
                 'sub_company_id' => $request->sub_company_id,
                 'invoice_number' => $request->invoice,
                 'vendor_id' => $request->vendor,
-                'transports' => $request->transport,
+                'transport' => $request->transport,
                 'transport_number' => $request->transport_number,
                 'igst' => $request->igst,
                 'cgst' => $request->cgst,
@@ -260,7 +259,12 @@ class PurchesBookController extends Controller
             ->select('items.*', 'variations.name as variation_name', 'taxes.rate as tax_rate')
             ->get();
 
-        return view('company.purches_book.edit', compact('purchaseBook', 'vendors', 'items','companyState'));
+        $subComapnys = SubCompany::where([
+            ['company_id', $compId],
+            ['status', 'active']
+        ])->get();
+
+        return view('company.purches_book.edit', compact('purchaseBook', 'vendors', 'items','companyState', 'subComapnys'));
     }
 
     public function view($id)
@@ -277,8 +281,7 @@ class PurchesBookController extends Controller
         $purchaseBook = PurchesBook::with(['purchesbookitem.item.variation']) // Keeping the original relation
         ->where('purches_books.id', $id)
         ->first();  
-        
-        $tranportname = Transport::where('id', $purchaseBook->transports)->first();
+        $tranportname = Transport::where('id', $purchaseBook->transport)->first();
         
 
 
@@ -340,6 +343,7 @@ class PurchesBookController extends Controller
         $purchaseBook->date = $request->date;
         $purchaseBook->invoice_number = $request->invoice;
         $purchaseBook->vendor_id = $request->vendor;
+        $purchaseBook->sub_company_id = $request->sub_company_id;
         $purchaseBook->transport = $request->transport;
         $purchaseBook->igst = $request->igst;
         $purchaseBook->cgst = $request->cgst;
@@ -472,25 +476,34 @@ class PurchesBookController extends Controller
                     ->first();
 
                 // Update or create the PurchesBookItem entry if quantity has changed or record doesn't exist
-                if (!$existingPurchesBookItem || $existingPurchesBookItem->preturn != $quantity) {
-                    $preturn = $existingPurchesBookItem->preturn - $quantity;
-                    PurchesBookItem::updateOrCreate(
-                        ['item_id' => $itemId, 'purches_book_id' => $id],
-                        [
-                            'preturn' => $preturn,
-                            'rate' => $amount,
-                            'tax' => $tax,
-                            'amount' => $total
-                        ]
-                    );
+                if ($existingPurchesBookItem) {
+                    $newqty = $quantity;
+                    $preturn = $existingPurchesBookItem->preturn + $newqty;
+                    
+                    if ($existingPurchesBookItem->quantity == $existingPurchesBookItem->preturn && $quantity > 0) {
+                        return redirect()->back()->withInput()->withErrors([
+                            'error' => "Cannot update. Quantity and return values are already equal for item ID $itemId."
+                        ]);
+                    }
+                } else {
+                    $preturn = $quantity;
+                    $newqty = $quantity;
                 }
 
-                $stkqty = $existingPurchesBookItem->quantity - $quantity;
-                // dd($stkqty);
+                PurchesBookItem::updateOrCreate(
+                    ['item_id' => $itemId, 'purches_book_id' => $id],
+                    [
+                        'preturn' => $preturn,
+                        'rate' => $amount,
+                        'tax' => $tax,
+                        'amount' => $total
+                    ]
+                );
+
                 // Update stock report
                 $stockReport = StockReport::where('item_id', $itemId)->first();
                 if ($stockReport) {
-                    $stockReport->decrement('quantity', $preturn);
+                    $stockReport->decrement('quantity', $newqty);
                 }
             }
             // Update the PurchesBook with the calculated grand total
@@ -508,7 +521,7 @@ class PurchesBookController extends Controller
                 $purchesBook->remaining_blance = $request->remaining_blance;
                 $purchesBook->cess = $request->total_cess;
                 $purchesBook->discount_value = $request->discount_value;
-                $purchesBook->sales_return = '1';
+                $purchesBook->purches_return = '1';
                 $purchesBook->save();
             }
 
