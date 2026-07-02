@@ -93,9 +93,6 @@ class CompanyController extends Controller
             'phone' => 'required|string|max:20|unique:companies',
             'address' => 'nullable|string',
             'short_code' => 'required|string',
-            'city' => 'required|string|max:100|not_in:Select City',
-            'state' => 'required|string|max:100|not_in:Select State',
-            'zipcode' => 'required|string|max:20|not_in:Select Pincode',
             'type' => 'required|string|in:type1,type2', // Adjust types as necessary
             'gstin' => 'required',
         ];
@@ -112,7 +109,7 @@ class CompanyController extends Controller
 
         // Save the company data
         $company = Company::create($request->only([
-            'name', 'email', 'phone', 'address', 'city', 'type','gstin','short_code','state','zipcode'
+            'name', 'email', 'phone', 'address', 'type','gstin','short_code'
         ]));
 
         return response()->json([
@@ -198,9 +195,6 @@ class CompanyController extends Controller
             'email' => 'required|email',
             'phone' => 'required|string',
             'address' => 'required|string',
-            'city' => 'required|string|not_in:Select City',
-            'state' => 'required|string|not_in:Select State',
-            'zipcode' => 'required|string|not_in:Select Pincode',
             'type' => 'required|string',
             'gstin' => 'required|string',
             'short_code' => 'required|string',

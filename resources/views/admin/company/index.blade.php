@@ -22,7 +22,6 @@
                                 <tr>
                                     <th>Company Name</th>
                                     <th>Short Code</th>
-                                    <th>Location</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -68,30 +67,6 @@
                     <div class="col-md-12 mb-3">
                         <label for="address" class="form-label">Address</label>
                         <textarea class="form-control" id="address" rows="3"></textarea>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="state">
-                            <option selected>Select  State</option>
-                            @foreach ($states as $state)
-                                <option value="{{$state->state_name}}" data-id="{{$state->state_id}}">{{$state->state_name}}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select class="form-select" id="city">
-                            <option selected>Select  City</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="zipcode" class="form-label">Pincode</label>
-                        <select class="form-select" id="zipcode">
-                            <option selected>Select  Pincode</option>
-                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -159,33 +134,6 @@
                     </div>
 
                     <div class="col-md-12 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="editstate">
-                            <option selected>Select State</option>
-                            @foreach ($states as $state)
-                                <option value="{{ $state->state_name }}" data-id="{{ $state->state_id }}">{{ $state->state_name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select class="form-select" id="editcity">
-                            <option selected>Select City</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label for="zipcode" class="form-label">Pincode</label>
-                        <select class="form-select" id="editzipcode">
-                            <option selected>Select Pincode</option>
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-
-                    <div class="col-md-12 mb-3">
                         <label for="gstin" class="form-label">GSTIN</label>
                         <input type="text" id="editgstin" class="form-control" placeholder="Enter GSTIN" />
                         <small class="error-text text-danger"></small>
@@ -231,10 +179,6 @@
                 },
                 { data: "short_code" },
                 {
-                    data: "city",
-                    render: (data, type, row) => `<a href="#">${row.city}</a>`,
-                },
-                {
                     data: "status",
                     render: (data, type, row) => {
                         const statusBadge = row.status === "active" ?
@@ -275,9 +219,6 @@
                 phone: $('#phone').val(),
                 short_code: $('#short_code').val(),
                 address: $('#address').val(),
-                city: $('#city').val(),
-                state: $('#state').val(),
-                zipcode: $('#zipcode').val(),
                 type: $('#type').val(),
                 gstin: $('#gstin').val(),
                 _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token for security
@@ -333,22 +274,9 @@
                     $('#editemail').val(company.email);
                     $('#editphone').val(company.phone);
                     $('#editaddress').val(company.address);
-                    $('#editstate').val(company.state);
                     $('#editshortcode').val(company.short_code);
                     $('#editgstin').val(company.gstin);
                     $('#edittype').val(company.type);
-
-                    // Populate city dropdown
-                    $('#editcity').empty().append('<option selected>Select City</option>');
-                    cities.forEach(city => {
-                        $('#editcity').append(`<option value="${city.city_name}" ${company.city === city.city_name ? 'selected' : ''}>${city.city_name}</option>`);
-                    });
-
-                    // Populate pincode dropdown
-                    $('#editzipcode').empty().append('<option selected>Select Pincode</option>');
-                    pincodes.forEach(pincode => {
-                        $('#editzipcode').append(`<option value="${pincode.pincode}" ${company.zipcode === pincode.pincode ? 'selected' : ''}>${pincode.pincode}</option>`);
-                    });
 
                     // Show the modal for editing
                     $('#editModal').modal('show');
@@ -374,9 +302,6 @@
                     email: $('#editemail').val(),
                     phone: $('#editphone').val(),
                     address: $('#editaddress').val(),
-                    city: $('#editcity').val(),
-                    state: $('#editstate').val(),
-                    zipcode: $('#editzipcode').val(),
                     type: $('#edittype').val(),
                     gstin: $('#editgstin').val(),
                     short_code: $('#editshortcode').val(),
@@ -470,68 +395,6 @@
         window.updateUserStatus = updateUserStatus;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
-        window.logoButton = logoButton;
-    });
-
-    // Event handling for dynamic state and city selection
-    $(document).ready(function () {
-        // Fetch cities when state is selected in 'Add Vendor' modal
-        $('#state').on('change', function () {
-            const stateId = $('#state').find(':selected').attr('data-id');
-            fetchCities(stateId, $('#city'));
-        });
-
-        // Fetch pincodes when city is selected in 'Add Vendor' modal
-        $('#city').on('change', function () {
-            const cityId = $('#city').find(':selected').attr('data-id');
-            fetchPincodes(cityId, $('#zipcode'));
-        });
-
-        // Fetch cities when state is selected in 'Edit Vendor' modal
-        $('#editstate').on('change', function () {
-            const stateId = $('#editstate').find(':selected').attr('data-id');
-            fetchCities(stateId, $('#editcity'));
-        });
-
-        // Fetch pincodes when city is selected in 'Edit Vendor' modal
-        $('#editcity').on('change', function () {
-            const cityId = $('#editcity').find(':selected').attr('data-id');
-            fetchPincodes(cityId, $('#editzipcode'));
-        });
-
-        // Function to fetch cities based on state ID
-        function fetchCities(stateId, cityElement) {
-            if (stateId) {
-                $.ajax({
-                    url: '{{ route("ajax.getCities", "") }}/' + stateId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        cityElement.empty().append('<option selected>Select City</option>');
-                        data.forEach(city => {
-                            cityElement.append(`<option value="${city.city_name}" data-id="${city.id}">${city.city_name}</option>`);
-                        });
-                    },
-                });
-            }
-        }
-
-        // Function to fetch pincodes based on city ID
-        function fetchPincodes(cityId, zipcodeElement) {
-            if (cityId) {
-                $.ajax({
-                    url: '{{ route("ajax.getPincodes", "") }}/' + cityId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        zipcodeElement.empty().append('<option selected>Select Pincode</option>');
-                        data.forEach(pincode => {
-                            zipcodeElement.append(`<option value="${pincode.pincode}">${pincode.pincode}</option>`);
-                        });
-                    },
-                });
-            }
-        }
     });
 
 </script>

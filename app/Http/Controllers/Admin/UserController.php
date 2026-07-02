@@ -127,8 +127,6 @@ class UserController extends Controller
                 }),
             ],
             'address' => 'nullable|string',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string',
             'password' => 'required|string',
         ];
 
@@ -155,8 +153,6 @@ class UserController extends Controller
             'full_name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'state' => $request->state,
-            'city' => $request->city,
             'role' => 'user',
             'password' => Hash::make($request->password),
             'company_id' => $compId
@@ -207,8 +203,6 @@ class UserController extends Controller
             'full_name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
             'id' => 'required|integer|exists:users,id', // Adjust as needed
         ]);
 
