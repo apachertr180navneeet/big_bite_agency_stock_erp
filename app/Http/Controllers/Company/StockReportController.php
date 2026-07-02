@@ -81,6 +81,7 @@ class StockReportController extends Controller
         $purchaseBooks = $query->groupBy(
                 'items.id', 
                 'items.name', 
+                'items.opening_stock',
                 'total_purches_book_qty', 
                 'total_preturn', 
                 'total_sales_book_qty', 
