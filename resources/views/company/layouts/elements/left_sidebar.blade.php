@@ -26,8 +26,6 @@
             </a>
             <ul class="menu-sub">
                 @foreach([
-                    
-                    ['route' => 'company.variation.index', 'text' => 'Category'],
                     ['route' => 'company.item.index', 'text' => 'Item'],
                     ['route' => 'company.vendor.index', 'text' => 'Creditors'],
                     ['route' => 'company.customer.index', 'text' => 'Customer'],

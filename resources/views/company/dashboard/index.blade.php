@@ -117,19 +117,6 @@
             </h3>
         </div>
         <div class="row mt-2">
-            <!-- Category Card -->
-            <div class="col-sm-6 col-lg-3 mb-4 text-center fade-in-up delay-1">
-                <a href="{{ route('company.variation.index') }}" class="text-decoration-none">
-                    <div class="card widget-flat dasbord_card card-grad-1">
-                        <div class="card-body card-body-custom">
-                            <i class='bx bx-category box_icon_custom'></i>
-                            <h5 class="card-title-custom mt-0" title="Number of Categories">Category</h5>
-                            <h3 class="mt-0 mb-0 dashboard_count">{{ $categoryCount }}</h3>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
             <!-- Item Card -->
             <div class="col-sm-6 col-lg-3 mb-4 text-center fade-in-up delay-2">
                 <a href="{{ route('company.item.index') }}" class="text-decoration-none">
